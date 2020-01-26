@@ -8,6 +8,7 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
 import org.rainyville.serverguard.server.permission.PermissionAPI;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
@@ -51,7 +52,9 @@ public class CommandPex extends PermissionCommandBase {
             if (args.length == 1) {
                 HashMap<UUID, ServerGuardPermissionHandler.Player> playerHashMap = handler.getRegisteredPlayers();
                 for (Map.Entry<UUID, ServerGuardPermissionHandler.Player> set : playerHashMap.entrySet()) {
-                    sender.addChatMessage(new ChatComponentText(set.getKey() + " (last known username: " + set.getValue().username + ")"));
+                    sender.addChatMessage(new ChatComponentText(set.getKey() +
+                            " (last known username: " + set.getValue().username + ")" + EnumChatFormatting.GREEN +
+                            " [" + String.join(", ", set.getValue().groups)));
                 }
             } else if (args.length == 2) {
                 String username = args[1];
@@ -78,9 +81,10 @@ public class CommandPex extends PermissionCommandBase {
                         sender.addChatMessage(new ChatComponentText(" - " + node));
                     }
                 }
-            } else if (args.length == 4) {
+            } else if (args.length == 4 || args.length == 5) {
                 String username = args[1];
                 String permission = args[3];
+
                 EntityPlayer entityPlayer = getPlayer(sender, username);
                 GameProfile profile;
                 if (entityPlayer != null) {
@@ -91,12 +95,29 @@ public class CommandPex extends PermissionCommandBase {
                 if (profile == null) {
                     throw new PlayerNotFoundException();
                 }
+
+                if (permission.equalsIgnoreCase("group")) {
+                    permission = args[4];
+                    String group = args[2];
+                    if (args[3].equalsIgnoreCase("add")) {
+                        handler.addPermissionToGroup(group, permission);
+                        sender.addChatMessage(new ChatComponentText("Added \"" + permission + "\" to " + group + "!"));
+                    } else if (args[3].equalsIgnoreCase("remove")) {
+                        handler.removePermissionFromGroup(group, permission);
+                        sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + group + "!"));
+                    } else {
+                        throw new WrongUsageException("commands.pex.usage");
+                    }
+                }
+
                 if (args[2].equalsIgnoreCase("add")) {
                     handler.addPermissionToPlayer(profile, permission);
                     sender.addChatMessage(new ChatComponentText("Added \"" + permission + "\" to " + username + "!"));
                 } else if (args[2].equalsIgnoreCase("remove")) {
                     handler.removePermissionFromPlayer(profile, permission);
                     sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + username + "!"));
+                } else {
+                    throw new WrongUsageException("commands.pex.usage");
                 }
             }
         }

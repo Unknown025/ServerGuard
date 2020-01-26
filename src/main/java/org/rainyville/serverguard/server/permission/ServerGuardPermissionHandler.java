@@ -131,12 +131,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
 
     @Nullable
     public Group getGroup(String name) {
-        for (Map.Entry<String, Group> set : GROUP_PERMISSION_MAP.entrySet()) {
-            if (set.getKey().equalsIgnoreCase(name)) {
-                return set.getValue();
-            }
-        }
-        return null;
+        return GROUP_PERMISSION_MAP.get(name);
     }
 
     @Nullable
@@ -182,18 +177,33 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
     }
 
     /**
-     * Adds a permission to a player.
+     * Adds a permission to a group.
      *
-     * @param uuid       UUID of the player.
+     * @param group      Group name.
      * @param permission Permission node.
-     * @return Returns if the operation was successful.
      */
-    public boolean addPermissionToPlayer(UUID uuid, String permission) {
-        Player player = PLAYER_PERMISSION_MAP.get(uuid);
-        if (player == null)
-            return false;
-        player.selfNodes.add(permission);
-        return true;
+    public void addPermissionToGroup(String group, String permission) {
+        Group savedGroup = getGroup(group);
+        if (savedGroup == null)
+            savedGroup = new Group();
+        savedGroup.selfNodes.add(permission);
+        GROUP_PERMISSION_MAP.put(group, savedGroup);
+        saveConfig();
+    }
+
+    /**
+     * Removes a permission from a group.
+     *
+     * @param group      Group name.
+     * @param permission Permission node.
+     */
+    public void removePermissionFromGroup(String group, String permission) {
+        Group savedGroup = getGroup(group);
+        if (savedGroup == null)
+            return;
+        savedGroup.selfNodes.remove(permission);
+        GROUP_PERMISSION_MAP.put(group, savedGroup);
+        saveConfig();
     }
 
     public static class Player {
@@ -230,7 +240,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         }
     }
 
-    class Config {
+    static class Config {
         public HashMap<UUID, Player> knownPlayers;
         public HashMap<String, Group> knownGroups;
     }
