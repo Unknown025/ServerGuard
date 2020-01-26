@@ -32,7 +32,10 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         return (HashMap<UUID, Player>) PLAYER_PERMISSION_MAP.clone();
     }
 
-    private void reloadConfig() {
+    /**
+     * Reloads the configuration file.
+     */
+    public void reloadConfig() {
         Gson gson = new Gson();
         try {
             FileReader input = new FileReader(CONFIG_FILE);
@@ -100,12 +103,12 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
                     if (group == null) continue;
                     // -permission.node overrides any other permission, player cannot execute this command.
                     if (group.hasPermission("-" + node)) {
-                        canExecute = false;
+                        return false;
                     }
                 }
             }
-
-            return canExecute;
+            if (canExecute)
+                return true;
         }
 
         if (level == DefaultPermissionLevel.NONE) {
@@ -154,6 +157,8 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         Player player = PLAYER_PERMISSION_MAP.get(profile.getId());
         if (player == null) {
             player = new Player(profile.getName());
+        } else if (player.selfNodes == null) {
+            player.selfNodes = new ArrayList<>();
         }
         player.selfNodes.add(permission);
         PLAYER_PERMISSION_MAP.put(profile.getId(), player);
@@ -170,6 +175,8 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         Player player = PLAYER_PERMISSION_MAP.get(profile.getId());
         if (player == null) {
             player = new Player(profile.getName());
+        } else if (player.selfNodes == null) {
+            player.selfNodes = new ArrayList<>();
         }
         player.selfNodes.remove(permission);
         PLAYER_PERMISSION_MAP.put(profile.getId(), player);
@@ -186,6 +193,8 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         Group savedGroup = getGroup(group);
         if (savedGroup == null)
             savedGroup = new Group();
+        else if (savedGroup.selfNodes == null)
+            savedGroup.selfNodes = new ArrayList<>();
         savedGroup.selfNodes.add(permission);
         GROUP_PERMISSION_MAP.put(group, savedGroup);
         saveConfig();
@@ -203,6 +212,47 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
             return;
         savedGroup.selfNodes.remove(permission);
         GROUP_PERMISSION_MAP.put(group, savedGroup);
+        saveConfig();
+    }
+
+    /**
+     * Adds a group to a player.
+     *
+     * @param profile   GameProfile of the player.
+     * @param groupName Group name.
+     */
+    public void addGroupToPlayer(GameProfile profile, String groupName) {
+        Group group = getGroup(groupName);
+        if (group == null) {
+            group = new Group();
+            GROUP_PERMISSION_MAP.put(groupName, group);
+        }
+        Player player = PLAYER_PERMISSION_MAP.get(profile.getId());
+        if (player == null) {
+            player = new Player(profile.getName());
+        } else if (player.groups == null) {
+            player.groups = new ArrayList<>();
+        }
+        player.groups.add(groupName);
+        PLAYER_PERMISSION_MAP.put(profile.getId(), player);
+        saveConfig();
+    }
+
+    /**
+     * Removes a group from a player.
+     *
+     * @param profile   GameProfile of the player.
+     * @param groupName Group name.
+     */
+    public void removeGroupFromPlayer(GameProfile profile, String groupName) {
+        Player player = PLAYER_PERMISSION_MAP.get(profile.getId());
+        if (player == null) {
+            player = new Player(profile.getName());
+        } else if (player.groups == null) {
+            player.groups = new ArrayList<>();
+        }
+        player.groups.remove(groupName);
+        PLAYER_PERMISSION_MAP.put(profile.getId(), player);
         saveConfig();
     }
 
@@ -229,6 +279,10 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
 
     static class Group {
         public List<String> selfNodes;
+
+        public Group() {
+            this.selfNodes = new ArrayList<>();
+        }
 
         public boolean hasPermission(String node) {
             for (String selfNode : selfNodes) {

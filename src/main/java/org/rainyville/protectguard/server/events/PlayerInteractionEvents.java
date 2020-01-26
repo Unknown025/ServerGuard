@@ -26,7 +26,10 @@ public class PlayerInteractionEvents {
 
             if (CommandInspect.enabledInspector.contains(event.getPlayer().getUniqueID())) {
                 event.setCanceled(true);
-                ResultSet rs = stat.executeQuery("select * from protectguard_break where xPos=" + event.x + " and yPos=" + event.y + " and zPos=" + event.z + ";");
+                ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_break WHERE " +
+                        "xPos BETWEEN " + (event.x - 5) + " AND " + (event.x + 5) +
+                        " AND yPos BETWEEN " + (event.y - 5) + " AND " + (event.y + 5) +
+                        " AND zPos BETWEEN " + (event.z - 5) + " AND " + (event.z + 5) + ";");
                 if (!rs.next()) {
                     event.getPlayer().addChatComponentMessage(new ChatComponentText("No data available."));
                 } else {
@@ -76,7 +79,10 @@ public class PlayerInteractionEvents {
 
             if (CommandInspect.enabledInspector.contains(event.player.getUniqueID())) {
                 event.setCanceled(true);
-                ResultSet rs = stat.executeQuery("select * from protectguard_place where xPos=" + event.x + " and yPos=" + event.y + " and zPos=" + event.z + ";");
+                ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_place WHERE " +
+                        "xPos BETWEEN " + (event.x - 5) + " AND " + (event.x + 5) +
+                        " AND yPos BETWEEN " + (event.y - 5) + " AND " + (event.y + 5) +
+                        " AND zPos BETWEEN " + (event.z - 5) + " AND " + (event.z + 5) + ";");
                 if (!rs.next()) {
                     event.player.addChatComponentMessage(new ChatComponentText("No data available."));
                 } else {
@@ -129,7 +135,10 @@ public class PlayerInteractionEvents {
             if (CommandInspect.enabledInspector.contains(event.entityPlayer.getUniqueID())) {
                 event.setCanceled(true);
                 if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-                    ResultSet rs = stat.executeQuery("select * from protectguard_place where xPos=" + event.x + " and yPos=" + event.y + " and zPos=" + event.z + ";");
+                    ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_place WHERE " +
+                            "xPos BETWEEN " + (event.x - 5) + " AND " + (event.x + 5) +
+                            " AND yPos BETWEEN " + (event.y - 5) + " AND " + (event.y + 5) +
+                            " AND zPos BETWEEN " + (event.z - 5) + " AND " + (event.z + 5) + ";");
                     if (!rs.next()) {
                         event.entityPlayer.addChatComponentMessage(new ChatComponentText("No data available."));
                     } else {
@@ -141,7 +150,10 @@ public class PlayerInteractionEvents {
                     }
                     rs.close();
                 } else if (event.action == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK){
-                    ResultSet rs = stat.executeQuery("select * from protectguard_break where xPos=" + event.x + " and yPos=" + event.y + " and zPos=" + event.z + ";");
+                    ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_break WHERE " +
+                            "xPos BETWEEN " + (event.x - 5) + " AND " + (event.x + 5) +
+                            " AND yPos BETWEEN " + (event.y - 5) + " AND " + (event.y + 5) +
+                            " AND zPos BETWEEN " + (event.z - 5) + " AND " + (event.z + 5) + ";");
                     if (!rs.next()) {
                         event.entityPlayer.addChatComponentMessage(new ChatComponentText("No data available."));
                     } else {

@@ -54,7 +54,7 @@ public class CommandPex extends PermissionCommandBase {
                 for (Map.Entry<UUID, ServerGuardPermissionHandler.Player> set : playerHashMap.entrySet()) {
                     sender.addChatMessage(new ChatComponentText(set.getKey() +
                             " (last known username: " + set.getValue().username + ")" + EnumChatFormatting.GREEN +
-                            " [" + String.join(", ", set.getValue().groups)));
+                            " [" + String.join(", ", set.getValue().groups) + "]"));
                 }
             } else if (args.length == 2) {
                 String username = args[1];
@@ -96,18 +96,18 @@ public class CommandPex extends PermissionCommandBase {
                     throw new PlayerNotFoundException();
                 }
 
-                if (permission.equalsIgnoreCase("group")) {
-                    permission = args[4];
-                    String group = args[2];
+                if (args[2].equalsIgnoreCase("group")) {
+                    String groupName = args[4];
                     if (args[3].equalsIgnoreCase("add")) {
-                        handler.addPermissionToGroup(group, permission);
-                        sender.addChatMessage(new ChatComponentText("Added \"" + permission + "\" to " + group + "!"));
+                        handler.addGroupToPlayer(profile, groupName);
+                        sender.addChatMessage(new ChatComponentText("Added \"" + groupName + "\" to " + username + "!"));
                     } else if (args[3].equalsIgnoreCase("remove")) {
-                        handler.removePermissionFromGroup(group, permission);
-                        sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + group + "!"));
+                        handler.removeGroupFromPlayer(profile, groupName);
+                        sender.addChatMessage(new ChatComponentText("Removed \"" + groupName + "\" from " + username + "!"));
                     } else {
                         throw new WrongUsageException("commands.pex.usage");
                     }
+                    return;
                 }
 
                 if (args[2].equalsIgnoreCase("add")) {
@@ -120,6 +120,9 @@ public class CommandPex extends PermissionCommandBase {
                     throw new WrongUsageException("commands.pex.usage");
                 }
             }
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            handler.reloadConfig();
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA + "Configuration file reloaded!"));
         }
     }
 }
