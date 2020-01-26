@@ -91,10 +91,10 @@ public class CommandPex extends PermissionCommandBase {
                 if (profile == null) {
                     throw new PlayerNotFoundException();
                 }
-                if (args[3].equalsIgnoreCase("add")) {
+                if (args[2].equalsIgnoreCase("add")) {
                     handler.addPermissionToPlayer(profile, permission);
                     sender.addChatMessage(new ChatComponentText("Added \"" + permission + "\" to " + username + "!"));
-                } else if (args[3].equalsIgnoreCase("remove")) {
+                } else if (args[2].equalsIgnoreCase("remove")) {
                     handler.removePermissionFromPlayer(profile, permission);
                     sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + username + "!"));
                 }

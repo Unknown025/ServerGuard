@@ -161,6 +161,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
             player = new Player(profile.getName());
         }
         player.selfNodes.add(permission);
+        PLAYER_PERMISSION_MAP.put(profile.getId(), player);
         saveConfig();
     }
 
@@ -176,6 +177,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
             player = new Player(profile.getName());
         }
         player.selfNodes.remove(permission);
+        PLAYER_PERMISSION_MAP.put(profile.getId(), player);
         saveConfig();
     }
 
