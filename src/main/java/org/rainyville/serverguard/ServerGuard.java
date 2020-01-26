@@ -6,12 +6,16 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.command.ICommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rainyville.serverguard.command.CommandAdmin;
 import org.rainyville.serverguard.command.CommandGameMode;
 import org.rainyville.serverguard.command.CommandKill;
+import org.rainyville.serverguard.command.PermissionCommandBase;
 import org.rainyville.serverguard.proxy.CommonProxy;
+
+import java.util.Map;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 @Mod(modid = ServerGuard.MODID, version = ServerGuard.VERSION, acceptableRemoteVersions = "*")
@@ -23,11 +27,19 @@ public class ServerGuard {
     @SidedProxy(serverSide = "org.rainyville.serverguard.proxy.CommonProxy", clientSide = "org.rainyville.serverguard.proxy.CommonProxy")
     public static CommonProxy proxy;
 
+    @SuppressWarnings("unchecked")
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandGameMode());
         event.registerServerCommand(new CommandKill());
         event.registerServerCommand(new CommandAdmin());
+        Map<String, ICommand> commandMap = event.getServer().getCommandManager().getCommands();
+        for (Map.Entry<String, ICommand> set : commandMap.entrySet()) {
+            if (set.getValue() instanceof PermissionCommandBase)
+                continue;
+            set.setValue(PermissionCommandBase.fromICommand(set.getValue()));
+            logger.info("Registered command " + set.getValue().getCommandName() + " with permission node " + ((PermissionCommandBase)set.getValue()).getPermissionNode());
+        }
     }
 
     @EventHandler
