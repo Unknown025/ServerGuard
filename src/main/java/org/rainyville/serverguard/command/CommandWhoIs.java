@@ -4,7 +4,7 @@ import net.minecraft.command.ICommandSender;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 
-public class WhoisCommand extends PermissionCommandBase {
+public class CommandWhoIs extends PermissionCommandBase {
     @Override
     public String getCommandName() {
         return "whois";

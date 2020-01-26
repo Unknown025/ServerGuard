@@ -4,6 +4,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.command.ICommand;
@@ -11,7 +12,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rainyville.serverguard.command.*;
 import org.rainyville.serverguard.proxy.CommonProxy;
+import org.rainyville.serverguard.server.permission.PermissionAPI;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
+import org.rainyville.serverguard.server.permission.ServerGuardPermissionHandler;
 
 import java.util.Map;
 
@@ -31,7 +34,8 @@ public class ServerGuard {
         event.registerServerCommand(new CommandGameMode());
         event.registerServerCommand(new CommandKill());
         event.registerServerCommand(new CommandAdmin());
-        event.registerServerCommand(new WhoisCommand());
+        event.registerServerCommand(new CommandWhoIs());
+        event.registerServerCommand(new CommandPex());
         Map<String, ICommand> commandMap = event.getServer().getCommandManager().getCommands();
         for (Map.Entry<String, ICommand> set : commandMap.entrySet()) {
             if (set.getValue() instanceof PermissionCommandBase)
@@ -47,5 +51,10 @@ public class ServerGuard {
         proxy.registerEvents();
         proxy.init(event);
         logger.info("Registered proxies.");
+    }
+
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        PermissionAPI.setPermissionHandler(new ServerGuardPermissionHandler(event.getSuggestedConfigurationFile()));
     }
 }

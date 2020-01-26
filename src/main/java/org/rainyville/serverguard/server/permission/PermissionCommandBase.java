@@ -41,6 +41,11 @@ public abstract class PermissionCommandBase extends CommandBase {
         return super.canCommandSenderUseCommand(sender);
     }
 
+    /**
+     * Creates a PermissionCommandBase object from an ICommand.
+     * @param command ICommand to transform.
+     * @return Returns a Permission interface compatible instance.
+     */
     public static PermissionCommandBase fromICommand(ICommand command) {
         return new PermissionCommandBase() {
             @Override
