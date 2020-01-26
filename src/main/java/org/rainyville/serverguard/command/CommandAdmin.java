@@ -6,11 +6,17 @@ import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
+import org.rainyville.serverguard.server.permission.PermissionAPI;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommandAdmin extends PermissionCommandBase {
+    public CommandAdmin() {
+        PermissionAPI.getPermissionHandler().registerNode(getPermissionNode(), DefaultPermissionLevel.OP, "Grants admin access.");
+    }
+
     @Override
     public String getPermissionNode() {
         return "serverguard.admin";
@@ -42,7 +48,7 @@ public class CommandAdmin extends PermissionCommandBase {
         if (profile == null)
             throw new PlayerNotFoundException();
         minecraftserver.getConfigurationManager().addOp(profile);
-        notifyOperators(sender, this, "commands.admin.success");
+        notifyOperators(sender, this, "commands.admin.success", "opped");
     }
 
     /**

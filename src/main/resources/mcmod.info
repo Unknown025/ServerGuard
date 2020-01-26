@@ -1,16 +1,35 @@
 [
-{
-  "modid": "serverguard",
-  "name": "ServerGuard",
-  "description": "Provides plugin replacement functionality for Forge.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "https://rainyville.org/",
-  "updateUrl": "",
-  "authorList": ["Unknown025"],
-  "credits": "",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
-}
+  {
+    "modid": "serverguard",
+    "name": "ServerGuard",
+    "description": "Provides plugin replacement functionality for Forge.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://rainyville.org/",
+    "updateUrl": "",
+    "authorList": [
+      "Unknown025"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  },
+  {
+    "modid": "protectguard",
+    "name": "ProtectGuard",
+    "description": "Records player and block activity.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "Unknown025"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies:": [],
+    "parent": "andai"
+  }
 ]

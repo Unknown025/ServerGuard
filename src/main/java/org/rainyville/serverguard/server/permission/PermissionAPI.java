@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.authlib.GameProfile;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderState;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,5 +71,19 @@ public class PermissionAPI {
     public static boolean hasPermission(EntityPlayer player, String node) {
         Preconditions.checkNotNull(player, "Player can't be null!");
         return hasPermission(player.getGameProfile(), node, new PlayerContext(player));
+    }
+
+    /**
+     * Shortcut method using ICommandSender.
+     * @param sender Any ICommandSender.
+     * @param node Node to check for.
+     * @return Returns if the sender has permission.
+     */
+    public static boolean hasPermission(ICommandSender sender, String node) {
+        Preconditions.checkNotNull(sender, "Sender can't be null!");
+        if (sender instanceof EntityPlayer) {
+            return hasPermission(((EntityPlayer) sender).getGameProfile(), node, new PlayerContext((EntityPlayer) sender));
+        }
+        return true;
     }
 }

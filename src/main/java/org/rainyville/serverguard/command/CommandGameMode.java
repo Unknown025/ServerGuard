@@ -12,8 +12,8 @@ import org.rainyville.serverguard.server.permission.PermissionAPI;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("rawtypes")
 public class CommandGameMode extends PermissionCommandBase {
-
     public CommandGameMode() {
         PermissionAPI.getPermissionHandler().registerNode(getPermissionNode(), DefaultPermissionLevel.OP, "Grants gamemode access.");
     }
@@ -29,8 +29,7 @@ public class CommandGameMode extends PermissionCommandBase {
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender)
-    {
+    public String getCommandUsage(ICommandSender sender) {
         return "commands.gamemode.usage";
     }
 
@@ -62,7 +61,7 @@ public class CommandGameMode extends PermissionCommandBase {
 
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args) {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, "survival", "creative", "adventure", "0", "1", "2") : (args.length == 2 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null);
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, "survival", "creative", "adventure", "0", "1", "2", "s", "c", "a") : (args.length == 2 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null);
     }
 
     /**
