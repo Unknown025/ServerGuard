@@ -7,15 +7,21 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.WorldSettings;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
-import org.rainyville.serverguard.server.permission.PermissionAPI;
+import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("rawtypes")
 public class CommandGameMode extends PermissionCommandBase {
-    public CommandGameMode() {
-        PermissionAPI.getPermissionHandler().registerNode(getPermissionNode(), DefaultPermissionLevel.OP, "Grants gamemode access.");
+    @Override
+    public DefaultPermissionLevel getPermissionLevel() {
+        return DefaultPermissionLevel.OP;
+    }
+
+    @Override
+    public String getDescription() {
+        return "";
     }
 
     @Override

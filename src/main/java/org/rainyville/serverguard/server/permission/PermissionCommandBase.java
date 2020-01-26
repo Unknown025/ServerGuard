@@ -1,20 +1,26 @@
-package org.rainyville.serverguard.command;
+package org.rainyville.serverguard.server.permission;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
-import org.rainyville.serverguard.server.permission.PermissionAPI;
 
 public abstract class PermissionCommandBase extends CommandBase {
     public PermissionCommandBase() {
-        register();
+        PermissionAPI.getPermissionHandler().registerNode(getPermissionNode(), getPermissionLevel(), getDescription());
     }
 
-    public void register() {
-        PermissionAPI.getPermissionHandler().registerNode(getPermissionNode(), DefaultPermissionLevel.NONE, "Default permission description.");
-    }
+    /**
+     * Gets the default permission level.
+     * @return permission level for this command.
+     */
+    public abstract DefaultPermissionLevel getPermissionLevel();
+
+    /**
+     * Gets the description for this permission node.
+     * @return Permission node description.
+     */
+    public abstract String getDescription();
 
     /**
      * Permission node for this command.
@@ -38,6 +44,16 @@ public abstract class PermissionCommandBase extends CommandBase {
     public static PermissionCommandBase fromICommand(ICommand command) {
         return new PermissionCommandBase() {
             @Override
+            public DefaultPermissionLevel getPermissionLevel() {
+                return DefaultPermissionLevel.OP;
+            }
+
+            @Override
+            public String getDescription() {
+                return "";
+            }
+
+            @Override
             public String getPermissionNode() {
                 return command.getClass().getCanonicalName();
             }
@@ -50,11 +66,6 @@ public abstract class PermissionCommandBase extends CommandBase {
             @Override
             public void processCommand(ICommandSender sender, String[] args) {
                 command.processCommand(sender, args);
-            }
-
-            @Override
-            public void register() {
-                PermissionAPI.getPermissionHandler().registerNode(getPermissionNode(), DefaultPermissionLevel.OP, "N/A");
             }
         };
     }

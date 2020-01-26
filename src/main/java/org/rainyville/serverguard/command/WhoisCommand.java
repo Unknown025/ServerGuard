@@ -1,12 +1,28 @@
 package org.rainyville.serverguard.command;
 
-import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
+import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 
-public class WhoisCommand extends CommandBase {
+public class WhoisCommand extends PermissionCommandBase {
     @Override
     public String getCommandName() {
         return "whois";
+    }
+
+    @Override
+    public DefaultPermissionLevel getPermissionLevel() {
+        return DefaultPermissionLevel.OP;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Retrieves all available information for a player.";
+    }
+
+    @Override
+    public String getPermissionNode() {
+        return "serverguard.command.whois";
     }
 
     @Override

@@ -5,11 +5,23 @@ import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.DamageSource;
+import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
+import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 
 public class CommandKill extends PermissionCommandBase {
     @Override
     public String getCommandName() {
         return "kill";
+    }
+
+    @Override
+    public DefaultPermissionLevel getPermissionLevel() {
+        return DefaultPermissionLevel.OP;
+    }
+
+    @Override
+    public String getDescription() {
+        return "";
     }
 
     @Override

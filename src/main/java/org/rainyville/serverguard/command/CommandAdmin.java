@@ -7,14 +7,20 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
-import org.rainyville.serverguard.server.permission.PermissionAPI;
+import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommandAdmin extends PermissionCommandBase {
-    public CommandAdmin() {
-        PermissionAPI.getPermissionHandler().registerNode(getPermissionNode(), DefaultPermissionLevel.OP, "Grants admin access.");
+    @Override
+    public DefaultPermissionLevel getPermissionLevel() {
+        return DefaultPermissionLevel.NONE;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Grants admin permissions.";
     }
 
     @Override

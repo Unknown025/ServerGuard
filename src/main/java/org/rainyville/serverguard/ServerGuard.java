@@ -9,11 +9,9 @@ import cpw.mods.fml.relauncher.Side;
 import net.minecraft.command.ICommand;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.rainyville.serverguard.command.CommandAdmin;
-import org.rainyville.serverguard.command.CommandGameMode;
-import org.rainyville.serverguard.command.CommandKill;
-import org.rainyville.serverguard.command.PermissionCommandBase;
+import org.rainyville.serverguard.command.*;
 import org.rainyville.serverguard.proxy.CommonProxy;
+import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 
 import java.util.Map;
 
@@ -33,6 +31,7 @@ public class ServerGuard {
         event.registerServerCommand(new CommandGameMode());
         event.registerServerCommand(new CommandKill());
         event.registerServerCommand(new CommandAdmin());
+        event.registerServerCommand(new WhoisCommand());
         Map<String, ICommand> commandMap = event.getServer().getCommandManager().getCommands();
         for (Map.Entry<String, ICommand> set : commandMap.entrySet()) {
             if (set.getValue() instanceof PermissionCommandBase)
