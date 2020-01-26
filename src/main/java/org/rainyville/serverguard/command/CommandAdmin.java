@@ -12,6 +12,11 @@ import java.util.List;
 
 public class CommandAdmin extends PermissionCommandBase {
     @Override
+    public String getPermissionNode() {
+        return "serverguard.admin";
+    }
+
+    @Override
     public String getCommandName() {
         return "admin";
     }
