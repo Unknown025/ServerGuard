@@ -36,20 +36,20 @@ public class CommandKill extends PermissionCommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        EntityPlayerMP entityplayermp = null;
+        EntityPlayerMP entityPlayerMP = null;
         if (args.length == 0) {
-            entityplayermp = getCommandSenderAsPlayer(sender);
+            entityPlayerMP = getCommandSenderAsPlayer(sender);
         } else if (args.length == 1) {
-            entityplayermp = getPlayer(sender, args[0]);
+            entityPlayerMP = getPlayer(sender, args[0]);
         }
-        if (entityplayermp == null) {
+        if (entityPlayerMP == null) {
             throw new PlayerNotFoundException();
         }
-        entityplayermp.attackEntityFrom(DamageSource.outOfWorld, Float.MAX_VALUE);
-        if (entityplayermp == sender) {
+        entityPlayerMP.attackEntityFrom(DamageSource.outOfWorld, Float.MAX_VALUE);
+        if (entityPlayerMP == sender) {
             sender.addChatMessage(new ChatComponentTranslation("commands.kill.success"));
         } else {
-            notifyOperators(sender, this, "commands.kill.success.other", entityplayermp.getCommandSenderName());
+            notifyOperators(sender, this, "commands.kill.success.other", entityPlayerMP.getCommandSenderName());
         }
     }
 }

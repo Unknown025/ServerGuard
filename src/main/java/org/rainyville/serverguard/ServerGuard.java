@@ -5,9 +5,11 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.command.ICommand;
+import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rainyville.serverguard.command.*;
@@ -28,7 +30,6 @@ public class ServerGuard {
     @SidedProxy(serverSide = "org.rainyville.serverguard.proxy.CommonProxy", clientSide = "org.rainyville.serverguard.proxy.CommonProxy")
     public static CommonProxy proxy;
 
-    @SuppressWarnings("unchecked")
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandGameMode());
@@ -36,12 +37,17 @@ public class ServerGuard {
         event.registerServerCommand(new CommandAdmin());
         event.registerServerCommand(new CommandWhoIs());
         event.registerServerCommand(new CommandPex());
-        Map<String, ICommand> commandMap = event.getServer().getCommandManager().getCommands();
+    }
+
+    @SuppressWarnings("unchecked")
+    @EventHandler
+    public void serverStarted(FMLServerStartedEvent event) {
+        Map<String, ICommand> commandMap = MinecraftServer.getServer().getCommandManager().getCommands();
         for (Map.Entry<String, ICommand> set : commandMap.entrySet()) {
             if (set.getValue() instanceof PermissionCommandBase)
                 continue;
             set.setValue(PermissionCommandBase.fromICommand(set.getValue()));
-            logger.info("Registered command " + set.getValue().getCommandName() + " with permission node " + ((PermissionCommandBase)set.getValue()).getPermissionNode());
+            ServerGuard.logger.info("Registered command " + set.getValue().getCommandName() + " with permission node " + ((PermissionCommandBase) set.getValue()).getPermissionNode());
         }
     }
 

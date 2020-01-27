@@ -16,6 +16,7 @@ import org.rainyville.serverguard.server.permission.ServerGuardPermissionHandler
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class CommandPex extends PermissionCommandBase {
@@ -50,10 +51,11 @@ public class CommandPex extends PermissionCommandBase {
         ServerGuardPermissionHandler handler = (ServerGuardPermissionHandler) PermissionAPI.getPermissionHandler();
         if (args[0].equalsIgnoreCase("user") || args[0].equalsIgnoreCase("users")) {
             if (args.length == 1) {
+                sender.addChatMessage(new ChatComponentText("Currently registered users:"));
                 HashMap<UUID, ServerGuardPermissionHandler.Player> playerHashMap = handler.getRegisteredPlayers();
                 for (Map.Entry<UUID, ServerGuardPermissionHandler.Player> set : playerHashMap.entrySet()) {
                     sender.addChatMessage(new ChatComponentText(set.getKey() +
-                            " (last known username: " + set.getValue().username + ")" + EnumChatFormatting.GREEN +
+                            " (Last known username: " + set.getValue().username + ")" + EnumChatFormatting.GREEN +
                             " [" + String.join(", ", set.getValue().groups) + "]"));
                 }
             } else if (args.length == 2) {
@@ -73,13 +75,10 @@ public class CommandPex extends PermissionCommandBase {
                         sender.addChatMessage(new ChatComponentText(" - " + group));
                     }
                 }
-                if (player.selfNodes.size() == 0) {
-                    sender.addChatMessage(new ChatComponentText("Own permissions: none"));
-                } else {
-                    sender.addChatMessage(new ChatComponentText("Own permissions: "));
-                    for (String node : player.selfNodes) {
-                        sender.addChatMessage(new ChatComponentText(" - " + node));
-                    }
+                sender.addChatMessage(new ChatComponentText(username + "'s permissions:"));
+                for (int i = 0; i < player.permissions.size(); i++) {
+                    String permission = player.permissions.get(i);
+                    sender.addChatMessage(new ChatComponentText(String.format("%d) %s", (i + 1), permission)));
                 }
             } else if (args.length == 4 || args.length == 5) {
                 String username = args[1];
@@ -116,6 +115,44 @@ public class CommandPex extends PermissionCommandBase {
                 } else if (args[2].equalsIgnoreCase("remove")) {
                     handler.removePermissionFromPlayer(profile, permission);
                     sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + username + "!"));
+                } else {
+                    throw new WrongUsageException("commands.pex.usage");
+                }
+            }
+        } else if (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("groups")) {
+            if (args.length == 1) {
+                sender.addChatMessage(new ChatComponentText("Registered groups:"));
+                Set<String> playerHashMap = handler.getRegisteredGroups();
+                for (String group : playerHashMap) {
+                    sender.addChatMessage(new ChatComponentText(group));
+                }
+            } else if (args.length == 2) {
+                String groupName = args[1];
+                ServerGuardPermissionHandler.Group group = handler.getGroup(groupName);
+                if (group == null) {
+                    sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s permissions:"));
+                    sender.addChatMessage(new ChatComponentText("   none"));
+                    return;
+                }
+                sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s permissions:"));
+                if (group.permissions.size() == 0) {
+                    sender.addChatMessage(new ChatComponentText("   none"));
+                } else {
+                    for (int i = 0; i < group.permissions.size(); i++) {
+                        String permission = group.permissions.get(i);
+                        sender.addChatMessage(new ChatComponentText(String.format("%d) " + permission, (i + 1))));
+                    }
+                }
+            } else if (args.length == 4) {
+                String groupName = args[1];
+                String permission = args[3];
+
+                if (args[2].equalsIgnoreCase("add")) {
+                    handler.addPermissionToGroup(groupName, permission);
+                    sender.addChatMessage(new ChatComponentText("Added \"" + permission + "\" to " + groupName + "!"));
+                } else if (args[2].equalsIgnoreCase("remove")) {
+                    handler.removePermissionFromGroup(groupName, permission);
+                    sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + groupName + "!"));
                 } else {
                     throw new WrongUsageException("commands.pex.usage");
                 }

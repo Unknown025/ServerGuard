@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import org.rainyville.serverguard.ServerGuard;
 import org.rainyville.serverguard.server.permission.context.IContext;
@@ -33,6 +34,15 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
     }
 
     /**
+     * Registers a new player in the configuration file.
+     * @param entityPlayer EntityPlayer to register.
+     */
+    public void registerPlayer(EntityPlayer entityPlayer) {
+        Player player = new Player(entityPlayer.getGameProfile().getName());
+        PLAYER_PERMISSION_MAP.putIfAbsent(entityPlayer.getUniqueID(), player);
+    }
+
+    /**
      * Reloads the configuration file.
      */
     public void reloadConfig() {
@@ -41,10 +51,15 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
             FileReader input = new FileReader(CONFIG_FILE);
             JsonReader reader = new JsonReader(input);
             Config config = gson.fromJson(reader, Config.class);
-            PLAYER_PERMISSION_MAP = config.knownPlayers;
-            GROUP_PERMISSION_MAP = config.knownGroups;
+            PLAYER_PERMISSION_MAP = config.players;
+            GROUP_PERMISSION_MAP = config.groups;
         } catch (Exception ex) {
             ServerGuard.logger.error(ex);
+        } finally {
+            if (PLAYER_PERMISSION_MAP == null)
+                PLAYER_PERMISSION_MAP = new HashMap<>();
+            if (GROUP_PERMISSION_MAP == null)
+                GROUP_PERMISSION_MAP = new HashMap<>();
         }
     }
 
@@ -53,8 +68,8 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
             Writer writer = new FileWriter(CONFIG_FILE);
             Gson json = new GsonBuilder().setPrettyPrinting().create();
             Config config = new Config();
-            config.knownPlayers = PLAYER_PERMISSION_MAP;
-            config.knownGroups = GROUP_PERMISSION_MAP;
+            config.players = PLAYER_PERMISSION_MAP;
+            config.groups = GROUP_PERMISSION_MAP;
             json.toJson(config, writer);
             writer.flush();
             writer.close();
@@ -93,17 +108,17 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
                 for (String groupName : player.groups) {
                     Group group = getGroup(groupName);
                     if (group == null) continue;
-                    if (group.hasPermission(node)) {
-                        canExecute = true;
+                    // -permission.node overrides any other permission, player cannot execute this command.
+                    if (group.hasPermission("-" + node)) {
+                        return false;
                     }
                 }
 
                 for (String groupName : player.groups) {
                     Group group = getGroup(groupName);
                     if (group == null) continue;
-                    // -permission.node overrides any other permission, player cannot execute this command.
-                    if (group.hasPermission("-" + node)) {
-                        return false;
+                    if (group.hasPermission(node)) {
+                        canExecute = true;
                     }
                 }
             }
@@ -157,10 +172,10 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         Player player = PLAYER_PERMISSION_MAP.get(profile.getId());
         if (player == null) {
             player = new Player(profile.getName());
-        } else if (player.selfNodes == null) {
-            player.selfNodes = new ArrayList<>();
+        } else if (player.permissions == null) {
+            player.permissions = new ArrayList<>();
         }
-        player.selfNodes.add(permission);
+        player.permissions.add(permission);
         PLAYER_PERMISSION_MAP.put(profile.getId(), player);
         saveConfig();
     }
@@ -175,10 +190,10 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         Player player = PLAYER_PERMISSION_MAP.get(profile.getId());
         if (player == null) {
             player = new Player(profile.getName());
-        } else if (player.selfNodes == null) {
-            player.selfNodes = new ArrayList<>();
+        } else if (player.permissions == null) {
+            player.permissions = new ArrayList<>();
         }
-        player.selfNodes.remove(permission);
+        player.permissions.remove(permission);
         PLAYER_PERMISSION_MAP.put(profile.getId(), player);
         saveConfig();
     }
@@ -193,9 +208,9 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         Group savedGroup = getGroup(group);
         if (savedGroup == null)
             savedGroup = new Group();
-        else if (savedGroup.selfNodes == null)
-            savedGroup.selfNodes = new ArrayList<>();
-        savedGroup.selfNodes.add(permission);
+        else if (savedGroup.permissions == null)
+            savedGroup.permissions = new ArrayList<>();
+        savedGroup.permissions.add(permission);
         GROUP_PERMISSION_MAP.put(group, savedGroup);
         saveConfig();
     }
@@ -210,7 +225,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         Group savedGroup = getGroup(group);
         if (savedGroup == null)
             return;
-        savedGroup.selfNodes.remove(permission);
+        savedGroup.permissions.remove(permission);
         GROUP_PERMISSION_MAP.put(group, savedGroup);
         saveConfig();
     }
@@ -256,19 +271,24 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         saveConfig();
     }
 
+    public Set<String> getRegisteredGroups() {
+        return GROUP_PERMISSION_MAP.keySet();
+    }
+
     public static class Player {
         public String username;
-        public List<String> selfNodes;
+        public List<String> permissions;
         public List<String> groups;
 
         public Player(String name) {
             this.username = name;
-            this.selfNodes = new ArrayList<>();
+            this.permissions = new ArrayList<>();
             this.groups = new ArrayList<>();
+            this.groups.add("default");
         }
 
         public boolean hasPermission(String node) {
-            for (String selfNode : selfNodes) {
+            for (String selfNode : permissions) {
                 if (selfNode.equalsIgnoreCase(node)) {
                     return true;
                 }
@@ -277,25 +297,38 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         }
     }
 
-    static class Group {
-        public List<String> selfNodes;
+    public static class Group {
+        public List<String> permissions;
 
         public Group() {
-            this.selfNodes = new ArrayList<>();
+            this.permissions = new ArrayList<>();
         }
 
         public boolean hasPermission(String node) {
-            for (String selfNode : selfNodes) {
+            for (String selfNode : permissions) {
                 if (selfNode.equalsIgnoreCase(node)) {
                     return true;
                 }
             }
             return false;
+        }
+
+        /**
+         * Returns the default group, which is automatically assigned to new users.
+         * @return Returns the default group.
+         */
+        public static Group getDefault() {
+            Group group = GROUP_PERMISSION_MAP.get("default");
+            if (group == null) {
+                group = new Group();
+                GROUP_PERMISSION_MAP.put("default", group);
+            }
+            return group;
         }
     }
 
     static class Config {
-        public HashMap<UUID, Player> knownPlayers;
-        public HashMap<String, Group> knownGroups;
+        public HashMap<UUID, Player> players;
+        public HashMap<String, Group> groups;
     }
 }

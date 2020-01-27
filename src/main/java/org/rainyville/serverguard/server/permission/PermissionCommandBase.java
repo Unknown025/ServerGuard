@@ -4,6 +4,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 
 public abstract class PermissionCommandBase extends CommandBase {
     public PermissionCommandBase() {
@@ -12,12 +13,14 @@ public abstract class PermissionCommandBase extends CommandBase {
 
     /**
      * Gets the default permission level.
+     *
      * @return permission level for this command.
      */
     public abstract DefaultPermissionLevel getPermissionLevel();
 
     /**
      * Gets the description for this permission node.
+     *
      * @return Permission node description.
      */
     public abstract String getDescription();
@@ -36,13 +39,20 @@ public abstract class PermissionCommandBase extends CommandBase {
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender sender) {
-        if (sender instanceof EntityPlayer)
-            return PermissionAPI.getPermissionHandler().hasPermission(getCommandSenderAsPlayer(sender).getGameProfile(), getPermissionNode(), null);
+        if (sender instanceof EntityPlayer) {
+            boolean canUseCommand = PermissionAPI.getPermissionHandler().hasPermission(getCommandSenderAsPlayer(sender).getGameProfile(), getPermissionNode(), null);
+            if (!canUseCommand) {
+                MinecraftServer.getServer().logInfo(sender.getCommandSenderName() + " issued server command: /" + getCommandName());
+                MinecraftServer.getServer().logWarning(sender.getCommandSenderName() + " was denied access to command.");
+            }
+            return canUseCommand;
+        }
         return super.canCommandSenderUseCommand(sender);
     }
 
     /**
      * Creates a PermissionCommandBase object from an ICommand.
+     *
      * @param command ICommand to transform.
      * @return Returns a Permission interface compatible instance.
      */
