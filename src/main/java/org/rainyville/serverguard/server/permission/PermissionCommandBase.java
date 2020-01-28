@@ -4,7 +4,6 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 
 public abstract class PermissionCommandBase extends CommandBase {
     public PermissionCommandBase() {
@@ -40,12 +39,7 @@ public abstract class PermissionCommandBase extends CommandBase {
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender sender) {
         if (sender instanceof EntityPlayer) {
-            boolean canUseCommand = PermissionAPI.getPermissionHandler().hasPermission(getCommandSenderAsPlayer(sender).getGameProfile(), getPermissionNode(), null);
-            if (!canUseCommand) {
-                MinecraftServer.getServer().logInfo(sender.getCommandSenderName() + " issued server command: /" + getCommandName());
-                MinecraftServer.getServer().logWarning(sender.getCommandSenderName() + " was denied access to command.");
-            }
-            return canUseCommand;
+            return PermissionAPI.getPermissionHandler().hasPermission(getCommandSenderAsPlayer(sender).getGameProfile(), getPermissionNode(), null);
         }
         return super.canCommandSenderUseCommand(sender);
     }

@@ -43,7 +43,7 @@ public class CommandPex extends PermissionCommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         if (args.length == 0) {
-            throw new WrongUsageException("commands.pex.usage");
+            throw new WrongUsageException("Invalid command syntax.");
         }
         if (!(PermissionAPI.getPermissionHandler() instanceof ServerGuardPermissionHandler)) {
             throw new CommandException("commands.pex.wrongpermissionhandler");
@@ -104,7 +104,7 @@ public class CommandPex extends PermissionCommandBase {
                         handler.removeGroupFromPlayer(profile, groupName);
                         sender.addChatMessage(new ChatComponentText("Removed \"" + groupName + "\" from " + username + "!"));
                     } else {
-                        throw new WrongUsageException("commands.pex.usage");
+                        throw new WrongUsageException("Invalid command syntax.");
                     }
                     return;
                 }
@@ -116,7 +116,7 @@ public class CommandPex extends PermissionCommandBase {
                     handler.removePermissionFromPlayer(profile, permission);
                     sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + username + "!"));
                 } else {
-                    throw new WrongUsageException("commands.pex.usage");
+                    throw new WrongUsageException("Invalid command syntax.");
                 }
             }
         } else if (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("groups")) {

@@ -17,7 +17,7 @@ import org.rainyville.protectguard.proxy.CommonProxy;
 @SuppressWarnings("unused")
 @Mod(modid = ProtectGuard.MODID, version = ProtectGuard.VERSION, name = ProtectGuard.NAME, acceptableRemoteVersions = "*")
 public class ProtectGuard {
-    public static final String MODID = "org/rainyville/protectguard";
+    public static final String MODID = "protectguard";
     public static final String VERSION = "1.0";
     public static final String NAME = "ProtectGuard";
     public static final Logger logger = LogManager.getLogger("ProtectGuard");

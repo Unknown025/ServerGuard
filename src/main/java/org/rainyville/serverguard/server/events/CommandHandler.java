@@ -6,8 +6,5 @@ import net.minecraftforge.event.CommandEvent;
 public class CommandHandler {
     @SubscribeEvent
     public void onCommand(CommandEvent event) {
-//        if (!(event.command instanceof PermissionCommandBase)) {
-//
-//        }
     }
 }

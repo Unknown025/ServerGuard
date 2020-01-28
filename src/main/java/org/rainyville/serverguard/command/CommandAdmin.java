@@ -3,6 +3,7 @@ package org.rainyville.serverguard.command;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
+import net.minecraft.command.SyntaxErrorException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
@@ -15,7 +16,7 @@ import java.util.List;
 public class CommandAdmin extends PermissionCommandBase {
     @Override
     public DefaultPermissionLevel getPermissionLevel() {
-        return DefaultPermissionLevel.NONE;
+        return DefaultPermissionLevel.OP;
     }
 
     @Override
@@ -35,35 +36,46 @@ public class CommandAdmin extends PermissionCommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "commands.admin.usage";
+        return "/admin";
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         GameProfile profile = null;
-        MinecraftServer minecraftserver = MinecraftServer.getServer();
+        MinecraftServer minecraftServer = MinecraftServer.getServer();
         if (sender instanceof EntityPlayer) {
             if (args.length > 0)
-                throw new WrongUsageException("commands.admin.usage");
-            profile = minecraftserver.getPlayerProfileCache().getGameProfileForUsername(sender.getCommandSenderName());
+                throw new SyntaxErrorException("commands.generic.syntax");
+            profile = minecraftServer.getPlayerProfileCache().getGameProfileForUsername(sender.getCommandSenderName());
         } else if (sender instanceof MinecraftServer) {
             if (args.length != 1)
-                throw new WrongUsageException("commands.admin.usage");
-            profile = minecraftserver.getPlayerProfileCache().getGameProfileForUsername(args[0]);
+                throw new SyntaxErrorException("commands.generic.syntax");
+            profile = minecraftServer.getPlayerProfileCache().getGameProfileForUsername(args[0]);
         }
         if (profile == null)
             throw new PlayerNotFoundException();
-        minecraftserver.getConfigurationManager().addOp(profile);
-        notifyOperators(sender, this, "commands.admin.success", "opped");
+        boolean opped = false;
+        if (minecraftServer.getConfigurationManager().canSendCommands(profile)) {
+            minecraftServer.getConfigurationManager().removeOp(profile);
+        } else {
+            minecraftServer.getConfigurationManager().addOp(profile);
+            opped = true;
+        }
+        if (sender instanceof MinecraftServer) {
+            notifyOperators(sender, this, "Updated %s's admin status to %s.", profile.getName(), opped ? "opped" : "deopped");
+        } else {
+            notifyOperators(sender, this, "Updated your admin status to %s.", opped ? "opped" : "deopped");
+        }
     }
 
     /**
      * Adds the strings available in this command to the given list of tab completion options.
      */
+    @SuppressWarnings("rawtypes")
     public List addTabCompletionOptions(ICommandSender sender, String[] args) {
         if (args.length == 1 && sender instanceof MinecraftServer) {
             String s = args[args.length - 1];
-            ArrayList<String> list = new ArrayList<String>();
+            ArrayList<String> list = new ArrayList<>();
             GameProfile[] gameProfiles = MinecraftServer.getServer().getGameProfiles();
 
             for (GameProfile gameprofile : gameProfiles) {

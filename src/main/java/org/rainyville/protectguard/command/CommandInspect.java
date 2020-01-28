@@ -20,7 +20,7 @@ public class CommandInspect extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "commands.inspect.usage";
+        return "/inspect";
     }
 
     @Override
@@ -38,11 +38,5 @@ public class CommandInspect extends CommandBase {
             enabledInspector.add(id);
             player.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Inspector enabled."));
         }
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public List getCommandAliases() {
-        return Collections.singletonList("co");
     }
 }
