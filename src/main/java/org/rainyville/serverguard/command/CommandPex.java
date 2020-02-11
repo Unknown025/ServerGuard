@@ -1,10 +1,7 @@
 package org.rainyville.serverguard.command;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerNotFoundException;
-import net.minecraft.command.WrongUsageException;
+import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
@@ -84,7 +81,7 @@ public class CommandPex extends PermissionCommandBase {
                 String username = args[1];
                 String permission = args[3];
 
-                EntityPlayer entityPlayer = getPlayer(sender, username);
+                EntityPlayer entityPlayer = PlayerSelector.matchOnePlayer(sender, username);
                 GameProfile profile;
                 if (entityPlayer != null) {
                     profile = entityPlayer.getGameProfile();

@@ -159,6 +159,9 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
                 return player;
             }
         }
+        GameProfile player = MinecraftServer.getServer().getPlayerProfileCache().getGameProfileForUsername(name);
+        if (player != null)
+            return PLAYER_PERMISSION_MAP.get(player.getId());
         return null;
     }
 
