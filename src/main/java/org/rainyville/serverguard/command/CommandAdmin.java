@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.SyntaxErrorException;
-import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
@@ -64,7 +63,7 @@ public class CommandAdmin extends PermissionCommandBase {
         if (sender instanceof MinecraftServer) {
             notifyOperators(sender, this, "Updated %s's admin status to %s.", profile.getName(), opped ? "opped" : "deopped");
         } else {
-            notifyOperators(sender, this, "Updated your admin status to %s.", opped ? "opped" : "deopped");
+            notifyOperators(sender, this, "Updated own admin status to %s.", opped ? "opped" : "deopped");
         }
     }
 
