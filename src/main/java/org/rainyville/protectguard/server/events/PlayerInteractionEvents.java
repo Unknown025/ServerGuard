@@ -17,114 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class PlayerInteractionEvents {
-//    @SubscribeEvent
-//    public void onBlockBreak(BlockEvent.BreakEvent event) {
-//        try {
-//            Class.forName("org.sqlite.JDBC");
-//            Connection conn = DriverManager.getConnection("jdbc:sqlite:protectguard.db");
-//            Statement stat = conn.createStatement();
-//
-//            if (CommandInspect.enabledInspector.contains(event.getPlayer().getUniqueID())) {
-//                event.setCanceled(true);
-//                ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_break WHERE " +
-//                        "xPos BETWEEN " + (event.x - 5) + " AND " + (event.x + 5) +
-//                        " AND yPos BETWEEN " + (event.y - 5) + " AND " + (event.y + 5) +
-//                        " AND zPos BETWEEN " + (event.z - 5) + " AND " + (event.z + 5) + ";");
-//                if (!rs.next()) {
-//                    event.getPlayer().addChatComponentMessage(new ChatComponentText("No data available."));
-//                } else {
-//                    do {
-//                        String username = MinecraftServer.getServer().getPlayerProfileCache().func_152652_a(UUID.fromString(rs.getString("uuid"))).getName();
-//                        String time = rs.getTimestamp("time").toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-//                        event.getPlayer().addChatComponentMessage(new ChatComponentTranslation("commands.inspect.destroyed", EnumChatFormatting.YELLOW + username, rs.getString("blockId"), time));
-//                    } while (rs.next());
-//                }
-//                rs.close();
-//                return;
-//            }
-//            stat.executeUpdate("create table if not exists protectguard_break (" +
-//                    "xPos INT," +
-//                    "yPos INT," +
-//                    "zPos INT," +
-//                    "uuid VARCHAR," +
-//                    "blockId VARCHAR," +
-//                    "time TIMESTAMP" +
-//                    ");");
-//            PreparedStatement prep = conn.prepareStatement(
-//                    "insert into protectguard_break values (?, ?, ?, ?, ?, ?);");
-//
-//            prep.setInt(1, event.x);
-//            prep.setInt(2, event.y);
-//            prep.setInt(3, event.z);
-//            prep.setString(4, event.getPlayer().getUniqueID().toString());
-//            prep.setString(5, Block.blockRegistry.getNameForObject(event.block));
-//            prep.setTimestamp(6, Timestamp.from(Instant.now()));
-//            prep.addBatch();
-//
-//            conn.setAutoCommit(false);
-//            prep.executeBatch();
-//            conn.setAutoCommit(true);
-//            conn.close();
-//        } catch (Exception ex) {
-//            ProtectGuard.logger.error("Exception occurred while executing a database query", ex);
-//        }
-//    }
-//
-//    @SubscribeEvent
-//    public void onBlockPlace(BlockEvent.PlaceEvent event) {
-//        try {
-//            Class.forName("org.sqlite.JDBC");
-//            Connection conn = DriverManager.getConnection("jdbc:sqlite:protectguard.db");
-//            Statement stat = conn.createStatement();
-//
-//            if (CommandInspect.enabledInspector.contains(event.player.getUniqueID())) {
-//                event.setCanceled(true);
-//                ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_place WHERE " +
-//                        "xPos BETWEEN " + (event.x - 5) + " AND " + (event.x + 5) +
-//                        " AND yPos BETWEEN " + (event.y - 5) + " AND " + (event.y + 5) +
-//                        " AND zPos BETWEEN " + (event.z - 5) + " AND " + (event.z + 5) + ";");
-//                if (!rs.next()) {
-//                    event.player.addChatComponentMessage(new ChatComponentText("No data available."));
-//                } else {
-//                    do {
-//                        String username = MinecraftServer.getServer().getPlayerProfileCache().func_152652_a(UUID.fromString(rs.getString("uuid"))).getName();
-//                        String time = rs.getTimestamp("time").toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-////                        event.player.addChatComponentMessage(new ChatComponentText(String.format("Player %s placed block with ID \"%s\" at %s", username, rs.getString("blockId"), time)));
-//                        event.player.addChatComponentMessage(new ChatComponentTranslation("commands.inspect.placed", EnumChatFormatting.YELLOW + username, rs.getString("blockId"), time));
-//                    } while (rs.next());
-//                }
-//                rs.close();
-//                return;
-//            }
-//
-//            stat.executeUpdate("create table if not exists protectguard_place (" +
-//                    "xPos INT," +
-//                    "yPos INT," +
-//                    "zPos INT," +
-//                    "uuid VARCHAR," +
-//                    "blockId VARCHAR," +
-//                    "time TIMESTAMP" +
-//                    ");");
-//            PreparedStatement prep = conn.prepareStatement(
-//                    "insert into protectguard_place values (?, ?, ?, ?, ?, ?);");
-//
-//            prep.setInt(1, event.x);
-//            prep.setInt(2, event.y);
-//            prep.setInt(3, event.z);
-//            prep.setString(4, event.player.getUniqueID().toString());
-//            prep.setString(5, Block.blockRegistry.getNameForObject(event.block));
-//            prep.setTimestamp(6, Timestamp.from(Instant.now()));
-//            prep.addBatch();
-//
-//            conn.setAutoCommit(false);
-//            prep.executeBatch();
-//            conn.setAutoCommit(true);
-//            conn.close();
-//        } catch (Exception ex) {
-//            ProtectGuard.logger.error("Exception occurred while executing a database query", ex);
-//        }
-//    }
-
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
         try {
@@ -150,8 +42,6 @@ public class PlayerInteractionEvents {
                             int xPos = rs.getInt("xPos");
                             int yPos = rs.getInt("yPos");
                             int zPos = rs.getInt("zPos");
-//                            event.entityPlayer.addChatComponentMessage(new ChatComponentText(String.format("Player %s destroyed block with ID \"%s\" at %s", username, rs.getString("blockId"), time)));
-//                            event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("commands.inspect.destroyed", EnumChatFormatting.YELLOW + username, rs.getString("blockId"), time));
                             String message = String.format(EnumChatFormatting.GOLD + "Player " + EnumChatFormatting.YELLOW + "%s" + EnumChatFormatting.GOLD + " placed block with ID " + EnumChatFormatting.ITALIC + EnumChatFormatting.GREEN + "%s " +
                                     EnumChatFormatting.GOLD + "at " + EnumChatFormatting.BLUE + "%s " + EnumChatFormatting.GOLD + "(x: %d, y: %d, z: %d).", username, blockId, time, xPos, yPos, zPos);
                             event.entityPlayer.addChatComponentMessage(new ChatComponentText(message));
@@ -174,8 +64,6 @@ public class PlayerInteractionEvents {
                             int xPos = rs.getInt("xPos");
                             int yPos = rs.getInt("yPos");
                             int zPos = rs.getInt("zPos");
-//                            event.entityPlayer.addChatComponentMessage(new ChatComponentText(String.format("Player %s destroyed block with ID \"%s\" at %s", username, rs.getString("blockId"), time)));
-//                            event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("commands.inspect.destroyed", EnumChatFormatting.YELLOW + username, rs.getString("blockId"), time));
                             String message = String.format(EnumChatFormatting.GOLD + "Player " + EnumChatFormatting.YELLOW + "%s" + EnumChatFormatting.GOLD + " destroyed block with ID " + EnumChatFormatting.ITALIC + EnumChatFormatting.RED + "%s " +
                                     EnumChatFormatting.GOLD + "at " + EnumChatFormatting.BLUE + "%s " + EnumChatFormatting.GOLD + "(x: %d, y: %d, z: %d).", username, blockId, time, xPos, yPos, zPos);
                             event.entityPlayer.addChatComponentMessage(new ChatComponentText(message));

@@ -3,10 +3,13 @@ package org.rainyville.serverguard.command;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.DamageSource;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
+
+import java.util.List;
 
 public class CommandKill extends PermissionCommandBase {
     @Override
@@ -36,20 +39,26 @@ public class CommandKill extends PermissionCommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        EntityPlayerMP entityPlayerMP = null;
+        EntityPlayerMP player = null;
         if (args.length == 0) {
-            entityPlayerMP = getCommandSenderAsPlayer(sender);
+            player = getCommandSenderAsPlayer(sender);
         } else if (args.length == 1) {
-            entityPlayerMP = getPlayer(sender, args[0]);
+            player = getPlayer(sender, args[0]);
         }
-        if (entityPlayerMP == null) {
+        if (player == null) {
             throw new PlayerNotFoundException();
         }
-        entityPlayerMP.attackEntityFrom(DamageSource.outOfWorld, Float.MAX_VALUE);
-        if (entityPlayerMP == sender) {
+        player.attackEntityFrom(DamageSource.outOfWorld, Float.MAX_VALUE);
+        if (player == sender) {
             sender.addChatMessage(new ChatComponentTranslation("commands.kill.success"));
         } else {
-            notifyOperators(sender, this, "commands.kill.success.other", entityPlayerMP.getCommandSenderName());
+            notifyOperators(sender, this, "commands.kill.success.other", player.getCommandSenderName());
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+        return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
     }
 }

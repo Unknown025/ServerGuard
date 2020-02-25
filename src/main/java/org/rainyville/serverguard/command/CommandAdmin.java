@@ -63,7 +63,7 @@ public class CommandAdmin extends PermissionCommandBase {
         if (sender instanceof MinecraftServer) {
             notifyOperators(sender, this, "Updated %s's admin status to %s.", profile.getName(), opped ? "opped" : "deopped");
         } else {
-            notifyOperators(sender, this, "Updated own admin status to %s.", opped ? "opped" : "deopped");
+            notifyOperators(sender, this, "Updated their admin status to %s.", opped ? "opped" : "deopped");
         }
     }
 
@@ -83,7 +83,7 @@ public class CommandAdmin extends PermissionCommandBase {
                 }
             }
 
-            return list;
+            return getListOfStringsMatchingLastWord(args, (String[]) list.toArray());
         } else {
             return null;
         }

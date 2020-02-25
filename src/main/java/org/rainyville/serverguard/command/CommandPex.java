@@ -11,10 +11,7 @@ import org.rainyville.serverguard.server.permission.PermissionAPI;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 import org.rainyville.serverguard.server.permission.ServerGuardPermissionHandler;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class CommandPex extends PermissionCommandBase {
     @Override
@@ -43,7 +40,7 @@ public class CommandPex extends PermissionCommandBase {
             throw new WrongUsageException("Invalid command syntax.");
         }
         if (!(PermissionAPI.getPermissionHandler() instanceof ServerGuardPermissionHandler)) {
-            throw new CommandException("commands.pex.wrongpermissionhandler");
+            throw new CommandException("Wrong permission handler.");
         }
         ServerGuardPermissionHandler handler = (ServerGuardPermissionHandler) PermissionAPI.getPermissionHandler();
         if (args[0].equalsIgnoreCase("user") || args[0].equalsIgnoreCase("users")) {
@@ -153,10 +150,32 @@ public class CommandPex extends PermissionCommandBase {
                 } else {
                     throw new WrongUsageException("commands.pex.usage");
                 }
+                return;
             }
         } else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             handler.reloadConfig();
             sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA + "Configuration file reloaded!"));
+            return;
         }
+        throw new SyntaxErrorException();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+        if (!(PermissionAPI.getPermissionHandler() instanceof ServerGuardPermissionHandler)) {
+            throw new CommandException("Wrong permission handler.");
+        }
+        ServerGuardPermissionHandler handler = (ServerGuardPermissionHandler) PermissionAPI.getPermissionHandler();
+        List<String> list = new ArrayList<>();
+        if (args.length == 0) {
+            list.add("group");
+            list.add("user");
+        } else if (args.length == 1) {
+            return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
+        } else {
+            list.addAll(handler.getRegisteredNodes());
+        }
+        return getListOfStringsMatchingLastWord(args, (String[]) list.toArray());
     }
 }
