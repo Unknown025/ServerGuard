@@ -1,3 +1,0 @@
-commands.inspect.usage=/inspect <toggles inspector>
-commands.inspect.destroyed=§6Player %s §cdestroyed §6block with ID §9"%s§9" §6at %s.
-commands.inspect.placed=§6Player %s §aplaced §6block with ID §9"%s§9" §6at %s.

@@ -10,14 +10,17 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.command.ICommand;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rainyville.serverguard.command.*;
 import org.rainyville.serverguard.proxy.CommonProxy;
+import org.rainyville.serverguard.server.DiscordBridge;
 import org.rainyville.serverguard.server.permission.PermissionAPI;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 import org.rainyville.serverguard.server.permission.ServerGuardPermissionHandler;
 
+import java.io.File;
 import java.util.Map;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -62,6 +65,13 @@ public class ServerGuard {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        PermissionAPI.setPermissionHandler(new ServerGuardPermissionHandler(event.getSuggestedConfigurationFile()));
+        PermissionAPI.setPermissionHandler(
+                new ServerGuardPermissionHandler(new File(event.getModConfigurationDirectory(), "permissions.json")));
+        Configuration configuration = new Configuration(event.getSuggestedConfigurationFile());
+        String token = configuration.getString
+                ("token", "Discord", null, "The token for Discord bot functionality.");
+        String reportChannel = configuration.getString
+                ("report_channel", "Discord", null, "Channel ID for the report channel.");
+        DiscordBridge.initialize(token, reportChannel);
     }
 }

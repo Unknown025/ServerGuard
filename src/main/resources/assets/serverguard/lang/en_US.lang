@@ -1,5 +1,0 @@
-commands.kill.success.other=Killed %s.
-commands.admin.success=Updated your admin status to: %s.
-commands.admin.usage=/admin
-commands.pex.wrongpermissionhandler=Incorrect permission handler set!
-commands.pex.usage=/pex help
