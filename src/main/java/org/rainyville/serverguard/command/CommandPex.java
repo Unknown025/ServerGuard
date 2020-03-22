@@ -26,7 +26,7 @@ public class CommandPex extends PermissionCommandBase {
 
     @Override
     public String getPermissionNode() {
-        return "serverguard.command.pex";
+        return "/pex <user : group>";
     }
 
     @Override
@@ -74,6 +74,7 @@ public class CommandPex extends PermissionCommandBase {
                     String permission = player.permissions.get(i);
                     sender.addChatMessage(new ChatComponentText(String.format("%d) %s", (i + 1), permission)));
                 }
+                return;
             } else if (args.length == 4 || args.length == 5) {
                 String username = args[1];
                 String permission = args[3];
@@ -148,7 +149,7 @@ public class CommandPex extends PermissionCommandBase {
                     handler.removePermissionFromGroup(groupName, permission);
                     sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + groupName + "!"));
                 } else {
-                    throw new WrongUsageException("commands.pex.usage");
+                    throw new WrongUsageException("/pex <user : group>");
                 }
                 return;
             }
@@ -157,7 +158,7 @@ public class CommandPex extends PermissionCommandBase {
             sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA + "Configuration file reloaded!"));
             return;
         }
-        throw new SyntaxErrorException();
+        throw new SyntaxErrorException("Invalid command syntax.");
     }
 
     @SuppressWarnings("rawtypes")
@@ -168,14 +169,25 @@ public class CommandPex extends PermissionCommandBase {
         }
         ServerGuardPermissionHandler handler = (ServerGuardPermissionHandler) PermissionAPI.getPermissionHandler();
         List<String> list = new ArrayList<>();
-        if (args.length == 0) {
+        if (args.length <= 1) {
             list.add("group");
             list.add("user");
-        } else if (args.length == 1) {
+        } else if (args.length <= 2) {
             return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
-        } else {
-            list.addAll(handler.getRegisteredNodes());
+        } else if (args.length <= 3) {
+            list.add("add");
+            if (args[0].equalsIgnoreCase("user")) {
+                list.add("group");
+            }
+        } else if (args.length <= 4) {
+            if (args[0].equalsIgnoreCase("user") && args[3].equalsIgnoreCase("group")) {
+                list.add("add");
+            } else {
+                list.addAll(handler.getRegisteredNodes());
+            }
+        } else if (args.length <= 5 && args[4].equalsIgnoreCase("group")) {
+            list.addAll(handler.getRegisteredGroups());
         }
-        return getListOfStringsMatchingLastWord(args, (String[]) list.toArray());
+        return getListOfStringsMatchingLastWord(args, list.toArray(new String[0]));
     }
 }

@@ -37,8 +37,8 @@ minecraft {
     mappings = "snapshot_20140925"
 
     srgExtra "PK: net/dv8tion/jda org/rainyville/serverguard/repack/net/dv8tion/jda"
-    srgExtra "PK: org/sqlite org/rainyville/serverguard/repack/org/sqlite"
-    srgExtra "PK: org/slf4j/impl org/rainyville/serverguard/repack/org/slf4j/impl"
+//    srgExtra "PK: org/sqlite org/rainyville/serverguard/repack/org/sqlite"
+    srgExtra "PK: org/slf4j org/rainyville/serverguard/repack/org/slf4j"
 }
 
 runClient {

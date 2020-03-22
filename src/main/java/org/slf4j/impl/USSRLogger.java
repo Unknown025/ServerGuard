@@ -7,7 +7,7 @@ import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
- * PACKAGE: com.nkvd.disconceal.logger
+ * PACKAGE: org.slf4j.impl
  * DATE: 2019-02-17
  * TIME: 11:26
  * PROJECT: ussr-bot

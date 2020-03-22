@@ -1,17 +1,17 @@
 package org.rainyville.protectguard.server.events;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import org.rainyville.protectguard.ProtectGuard;
 import org.rainyville.protectguard.command.CommandInspect;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -73,6 +73,85 @@ public class PlayerInteractionEvents {
                 }
                 return;
             }
+            conn.close();
+        } catch (Exception ex) {
+            ProtectGuard.logger.error("Exception occurred while executing a database query", ex);
+        }
+    }
+
+    @SubscribeEvent
+    public void onBlockBreak(BlockEvent.BreakEvent event) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:protectguard.db");
+            Statement stat = conn.createStatement();
+
+            if (CommandInspect.enabledInspector.contains(event.getPlayer().getUniqueID())) {
+                event.setCanceled(true);
+                return;
+            }
+            stat.executeUpdate("create table if not exists protectguard_break (" +
+                    "xPos INT," +
+                    "yPos INT," +
+                    "zPos INT," +
+                    "uuid VARCHAR," +
+                    "blockId VARCHAR," +
+                    "time TIMESTAMP" +
+                    ");");
+            PreparedStatement prep = conn.prepareStatement(
+                    "insert into protectguard_break values (?, ?, ?, ?, ?, ?);");
+
+            prep.setInt(1, event.x);
+            prep.setInt(2, event.y);
+            prep.setInt(3, event.z);
+            prep.setString(4, event.getPlayer().getUniqueID().toString());
+            prep.setString(5, Block.blockRegistry.getNameForObject(event.block));
+            prep.setTimestamp(6, Timestamp.from(Instant.now()));
+            prep.addBatch();
+
+            conn.setAutoCommit(false);
+            prep.executeBatch();
+            conn.setAutoCommit(true);
+            conn.close();
+        } catch (Exception ex) {
+            ProtectGuard.logger.error("Exception occurred while executing a database query", ex);
+        }
+    }
+
+    @SubscribeEvent
+    public void onBlockPlace(BlockEvent.PlaceEvent event) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:protectguard.db");
+            Statement stat = conn.createStatement();
+
+            if (CommandInspect.enabledInspector.contains(event.player.getUniqueID())) {
+                event.setCanceled(true);
+                return;
+            }
+
+            stat.executeUpdate("create table if not exists protectguard_place (" +
+                    "xPos INT," +
+                    "yPos INT," +
+                    "zPos INT," +
+                    "uuid VARCHAR," +
+                    "blockId VARCHAR," +
+                    "time TIMESTAMP" +
+                    ");");
+            PreparedStatement prep = conn.prepareStatement(
+                    "insert into protectguard_place values (?, ?, ?, ?, ?, ?);");
+
+            prep.setInt(1, event.x);
+            prep.setInt(2, event.y);
+            prep.setInt(3, event.z);
+            prep.setString(4, event.player.getUniqueID().toString());
+            prep.setString(5, Block.blockRegistry.getNameForObject(event.block));
+            prep.setTimestamp(6, Timestamp.from(Instant.now()));
+            prep.addBatch();
+
+            conn.setAutoCommit(false);
+            prep.executeBatch();
+            conn.setAutoCommit(true);
             conn.close();
         } catch (Exception ex) {
             ProtectGuard.logger.error("Exception occurred while executing a database query", ex);

@@ -4,7 +4,7 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
 
 /**
- * PACKAGE: com.nkvd.disconceal.logger
+ * PACKAGE: org.slf4j.impl
  * DATE: 2019-02-17
  * TIME: 12:20
  * PROJECT: ussr-bot
