@@ -35,6 +35,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
 
     /**
      * Registers a new player in the configuration file.
+     *
      * @param entityPlayer EntityPlayer to register.
      */
     public void registerPlayer(EntityPlayer entityPlayer) {
@@ -63,6 +64,9 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         }
     }
 
+    /**
+     * Saves the configuration file.
+     */
     private void saveConfig() {
         try {
             Writer writer = new FileWriter(CONFIG_FILE);
@@ -290,6 +294,12 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
             this.groups.add("default");
         }
 
+        /**
+         * Checks if this player has permission to use a command.
+         *
+         * @param node Command permission node.
+         * @return Returns if the player has permission.
+         */
         public boolean hasPermission(String node) {
             for (String selfNode : permissions) {
                 if (selfNode.equalsIgnoreCase(node)) {
@@ -307,6 +317,12 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
             this.permissions = new ArrayList<>();
         }
 
+        /**
+         * Checks if this group has permission to use a command.
+         *
+         * @param node Command permission node.
+         * @return Returns if the group has permission.
+         */
         public boolean hasPermission(String node) {
             for (String selfNode : permissions) {
                 if (selfNode.equalsIgnoreCase(node)) {
@@ -318,6 +334,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
 
         /**
          * Returns the default group, which is automatically assigned to new users.
+         *
          * @return Returns the default group.
          */
         public static Group getDefault() {

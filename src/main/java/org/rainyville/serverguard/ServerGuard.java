@@ -41,6 +41,7 @@ public class ServerGuard {
         event.registerServerCommand(new CommandWhoIs());
         event.registerServerCommand(new CommandPex());
         event.registerServerCommand(new CommandSpawn());
+        event.registerServerCommand(new CommandReport());
     }
 
     @SuppressWarnings("unchecked")
@@ -67,11 +68,14 @@ public class ServerGuard {
     public void preInit(FMLPreInitializationEvent event) {
         PermissionAPI.setPermissionHandler(
                 new ServerGuardPermissionHandler(new File(event.getModConfigurationDirectory(), "permissions.json")));
-        Configuration configuration = new Configuration(event.getSuggestedConfigurationFile());
-        String token = configuration.getString
-                ("token", "Discord", null, "The token for Discord bot functionality.");
-        String reportChannel = configuration.getString
-                ("report_channel", "Discord", null, "Channel ID for the report channel.");
-        DiscordBridge.initialize(token, reportChannel);
+        if (event.getSide().isServer()) {
+            Configuration configuration = new Configuration(event.getSuggestedConfigurationFile());
+            String token = configuration.getString
+                    ("token", "Discord", "", "The token for Discord bot functionality.");
+            String reportChannel = configuration.getString
+                    ("report_channel", "Discord", "", "Channel ID for the report channel.");
+            configuration.save();
+            DiscordBridge.initialize(token, reportChannel);
+        }
     }
 }

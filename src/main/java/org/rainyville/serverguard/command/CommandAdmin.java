@@ -25,7 +25,7 @@ public class CommandAdmin extends PermissionCommandBase {
 
     @Override
     public String getPermissionNode() {
-        return "serverguard.admin";
+        return "serverguard.command.admin";
     }
 
     @Override

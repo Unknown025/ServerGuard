@@ -21,7 +21,7 @@
     "description": "Records player and block activity.",
     "version": "${version}",
     "mcversion": "${mcversion}",
-    "url": "",
+    "url": "https://rainyville.org/",
     "updateUrl": "",
     "authorList": [
       "Unknown025"

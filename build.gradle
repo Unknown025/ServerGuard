@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -19,6 +19,10 @@ repositories {
     jcenter()
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.5'
+}
+
 apply plugin: 'forge'
 
 version = "1.0"
@@ -31,6 +35,10 @@ minecraft {
     version = "1.7.10-10.13.4.1614-1.7.10"
     runDir = "eclipse"
     mappings = "snapshot_20140925"
+
+    srgExtra "PK: net/dv8tion/jda org/rainyville/serverguard/repack/net/dv8tion/jda"
+    srgExtra "PK: org/sqlite org/rainyville/serverguard/repack/org/sqlite"
+    srgExtra "PK: org/slf4j/impl org/rainyville/serverguard/repack/org/slf4j/impl"
 }
 
 runClient {
@@ -38,8 +46,8 @@ runClient {
 }
 
 configurations {
-    embed
-    compile.extendsFrom(embed)
+    shade
+    compile.extendsFrom(shade)
 }
 
 dependencies {
@@ -55,13 +63,17 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-//    compile files('libs/sqlite-jdbc-3.30.1.jar')
-    embed group: 'org.xerial', name: 'sqlite-jdbc', version: '3.30.1'
-    embed 'net.dv8tion:JDA:4.1.1_110'
+    shade 'com.googlecode.efficient-java-matrix-library:ejml:0.25'
+    shade group: 'org.xerial', name: 'sqlite-jdbc', version: '3.30.1'
+    shade('net.dv8tion:JDA:3.8.3_464') { exclude module: 'opus-java' }
 }
 
 jar {
-    from configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
+    configurations.shade.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
 }
 
 processResources
@@ -78,7 +90,7 @@ processResources
                 expand 'version': project.version, 'mcversion': project.minecraft.version
             }
 
-            // copy everything else, thats not the mcmod.info
+            // copy everything else, that's not the mcmod.info
             from(sourceSets.main.resources.srcDirs) {
                 exclude 'mcmod.info'
             }

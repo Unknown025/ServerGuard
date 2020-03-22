@@ -76,6 +76,14 @@ public abstract class PermissionCommandBase extends CommandBase {
             public void processCommand(ICommandSender sender, String[] args) {
                 command.processCommand(sender, args);
             }
+
+            @Override
+            public boolean canCommandSenderUseCommand(ICommandSender sender) {
+                if (sender instanceof EntityPlayer) {
+                    return PermissionAPI.getPermissionHandler().hasPermission(getCommandSenderAsPlayer(sender).getGameProfile(), getPermissionNode(), null);
+                }
+                return command.canCommandSenderUseCommand(sender);
+            }
         };
     }
 }
