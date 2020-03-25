@@ -6,15 +6,15 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderState;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.rainyville.serverguard.ServerGuard;
 import org.rainyville.serverguard.server.permission.context.IContext;
 import org.rainyville.serverguard.server.permission.context.PlayerContext;
 
 import javax.annotation.Nullable;
 
 public class PermissionAPI {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = ServerGuard.logger;
 
     private static IPermissionHandler permissionHandler = DefaultPermissionHandler.INSTANCE;
 

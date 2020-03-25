@@ -25,8 +25,13 @@ public class CommandPex extends PermissionCommandBase {
     }
 
     @Override
-    public String getPermissionNode() {
+    public String getCommandUsage(ICommandSender sender) {
         return "/pex <user : group>";
+    }
+
+    @Override
+    public String getPermissionNode() {
+        return "serverguard.command.pex";
     }
 
     @Override
@@ -113,6 +118,7 @@ public class CommandPex extends PermissionCommandBase {
                 } else {
                     throw new WrongUsageException("Invalid command syntax.");
                 }
+                return;
             }
         } else if (args[0].equalsIgnoreCase("group") || args[0].equalsIgnoreCase("groups")) {
             if (args.length == 1) {

@@ -3,10 +3,13 @@ package org.rainyville.serverguard.command;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
+
+import java.util.List;
 
 public class CommandWhoIs extends PermissionCommandBase {
     @Override
@@ -50,7 +53,17 @@ public class CommandWhoIs extends PermissionCommandBase {
                 EnumChatFormatting.RED + player.getFoodStats().getFoodLevel() + "/20"));
         sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Alive: " +
                 EnumChatFormatting.RED + player.isEntityAlive()));
+        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Location: " +
+                EnumChatFormatting.RED + "(" + player.posX + ", " + player.posY + ", " + player.posZ + ")"));
+        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Dimension: " +
+                EnumChatFormatting.RED + player.dimension));
         sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "IP Address: " +
                 EnumChatFormatting.GREEN + player.getPlayerIP()));
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+        return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
     }
 }

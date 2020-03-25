@@ -5,6 +5,8 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 
+import java.util.List;
+
 public abstract class PermissionCommandBase extends CommandBase {
     public PermissionCommandBase() {
         PermissionAPI.getPermissionHandler().registerNode(getPermissionNode(), getPermissionLevel(), getDescription());
@@ -51,6 +53,7 @@ public abstract class PermissionCommandBase extends CommandBase {
      * @return Returns a Permission interface compatible instance.
      */
     public static PermissionCommandBase fromICommand(ICommand command) {
+        //noinspection rawtypes
         return new PermissionCommandBase() {
             @Override
             public DefaultPermissionLevel getPermissionLevel() {
@@ -83,6 +86,26 @@ public abstract class PermissionCommandBase extends CommandBase {
                     return PermissionAPI.getPermissionHandler().hasPermission(getCommandSenderAsPlayer(sender).getGameProfile(), getPermissionNode(), null);
                 }
                 return command.canCommandSenderUseCommand(sender);
+            }
+
+            @Override
+            public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+                return command.addTabCompletionOptions(sender, args);
+            }
+
+            @Override
+            public List getCommandAliases() {
+                return command.getCommandAliases();
+            }
+
+            @Override
+            public String getCommandUsage(ICommandSender sender) {
+                return command.getCommandUsage(sender);
+            }
+
+            @Override
+            public boolean isUsernameIndex(String[] args, int index) {
+                return command.isUsernameIndex(args, index);
             }
         };
     }
