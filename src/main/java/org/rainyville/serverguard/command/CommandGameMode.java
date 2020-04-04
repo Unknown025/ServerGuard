@@ -49,7 +49,8 @@ public class CommandGameMode extends PermissionCommandBase {
             ChatComponentTranslation translation = new ChatComponentTranslation("gameMode." + gameType.getName());
 
             if (player != sender) {
-                notifyOperators(sender, this, 1, "commands.gamemode.success.other", player.getCommandSenderName(), translation);
+                notifyOperators(sender, this, 1, "commands.gamemode.success.other",
+                        player.getCommandSenderName(), translation);
             } else {
                 notifyOperators(sender, this, 1, "commands.gamemode.success.self", translation);
             }
@@ -67,11 +68,13 @@ public class CommandGameMode extends PermissionCommandBase {
 
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args) {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, "survival", "creative", "adventure", "0", "1", "2", "s", "c", "a") : (args.length == 2 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null);
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, "survival", "creative", "adventure",
+                "0", "1", "2", "s", "c", "a") :
+                (args.length == 2 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null);
     }
 
     /**
-     * Gets the Game Mode specified in the command.
+     * Gets the gamemode specified in the command.
      */
     private WorldSettings.GameType getGameModeFromCommand(ICommandSender sender, String mode) {
         return !mode.equalsIgnoreCase(WorldSettings.GameType.SURVIVAL.getName()) &&

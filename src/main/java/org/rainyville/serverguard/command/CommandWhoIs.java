@@ -53,8 +53,10 @@ public class CommandWhoIs extends PermissionCommandBase {
                 EnumChatFormatting.RED + player.getFoodStats().getFoodLevel() + "/20"));
         sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Alive: " +
                 EnumChatFormatting.RED + player.isEntityAlive()));
+        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Gamemode: " +
+                EnumChatFormatting.RED + (player.capabilities.isCreativeMode ? "1" : (player.capabilities.allowEdit ? "0" : "2"))));
         sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Location: " +
-                EnumChatFormatting.RED + "(" + player.posX + ", " + player.posY + ", " + player.posZ + ")"));
+                EnumChatFormatting.RED + "(" + (int) player.posX + ", " + (int) player.posY + ", " + (int) player.posZ + ")"));
         sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Dimension: " +
                 EnumChatFormatting.RED + player.dimension));
         sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "IP Address: " +

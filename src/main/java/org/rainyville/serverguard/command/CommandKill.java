@@ -52,7 +52,7 @@ public class CommandKill extends PermissionCommandBase {
         if (player == sender) {
             sender.addChatMessage(new ChatComponentTranslation("commands.kill.success"));
         } else {
-            notifyOperators(sender, this, "commands.kill.success.other", player.getCommandSenderName());
+            notifyOperators(sender, this, "Killed %s", player.getCommandSenderName());
         }
     }
 

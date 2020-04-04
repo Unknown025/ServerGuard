@@ -36,7 +36,7 @@ public class CommandSpawn extends PermissionCommandBase {
         } else if (args.length == 1) {
             EntityPlayer player = getPlayer(sender, args[0]);
             player.setPositionAndUpdate(coords.posX, coords.posY, coords.posZ);
-            notifyOperators(sender, this, 0, "%s warped to spawn.", sender.getCommandSenderName());
+            notifyOperators(sender, this, 0, "%s warped to spawn.", player.getCommandSenderName());
         }
     }
 }
