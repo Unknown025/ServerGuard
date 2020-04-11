@@ -82,14 +82,15 @@ public class PlayerInteractionEvents {
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event) {
         try {
-            Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:protectguard.db");
-            Statement stat = conn.createStatement();
-
             if (CommandInspect.enabledInspector.contains(event.getPlayer().getUniqueID())) {
                 event.setCanceled(true);
                 return;
             }
+
+            Class.forName("org.sqlite.JDBC");
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:protectguard.db");
+            Statement stat = conn.createStatement();
+
             stat.executeUpdate("create table if not exists protectguard_break (" +
                     "xPos INT," +
                     "yPos INT," +
@@ -121,14 +122,14 @@ public class PlayerInteractionEvents {
     @SubscribeEvent
     public void onBlockPlace(BlockEvent.PlaceEvent event) {
         try {
-            Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:protectguard.db");
-            Statement stat = conn.createStatement();
-
             if (CommandInspect.enabledInspector.contains(event.player.getUniqueID())) {
                 event.setCanceled(true);
                 return;
             }
+
+            Class.forName("org.sqlite.JDBC");
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:protectguard.db");
+            Statement stat = conn.createStatement();
 
             stat.executeUpdate("create table if not exists protectguard_place (" +
                     "xPos INT," +

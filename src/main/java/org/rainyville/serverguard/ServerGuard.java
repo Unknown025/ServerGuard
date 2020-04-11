@@ -68,14 +68,12 @@ public class ServerGuard {
     public void preInit(FMLPreInitializationEvent event) {
         PermissionAPI.setPermissionHandler(
                 new ServerGuardPermissionHandler(new File(event.getModConfigurationDirectory(), "permissions.json")));
-        if (event.getSide().isServer()) {
-            Configuration configuration = new Configuration(event.getSuggestedConfigurationFile());
-            String token = configuration.getString
-                    ("token", "Discord", "", "The token for Discord bot functionality.");
-            String reportChannel = configuration.getString
-                    ("report_channel", "Discord", "", "Channel ID for the report channel.");
-            configuration.save();
-            DiscordBridge.initialize(token, reportChannel);
-        }
+        Configuration configuration = new Configuration(event.getSuggestedConfigurationFile());
+        String token = configuration.getString
+                ("token", "Discord", "", "The token for Discord bot functionality.");
+        String reportChannel = configuration.getString
+                ("report_channel", "Discord", "", "Channel ID for the report channel.");
+        configuration.save();
+        DiscordBridge.initialize(token, reportChannel);
     }
 }

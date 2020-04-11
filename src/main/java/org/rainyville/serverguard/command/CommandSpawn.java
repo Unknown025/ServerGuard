@@ -32,11 +32,11 @@ public class CommandSpawn extends PermissionCommandBase {
         ChunkCoordinates coords = sender.getEntityWorld().getSpawnPoint();
         if (args.length == 0 && sender instanceof EntityPlayer) {
             getCommandSenderAsPlayer(sender).setPositionAndUpdate(coords.posX, coords.posY, coords.posZ);
-            notifyOperators(sender, this, 1, "Warped to spawn.");
+            notifyOperators(sender, this, 1, "Warped to spawn");
         } else if (args.length == 1) {
             EntityPlayer player = getPlayer(sender, args[0]);
             player.setPositionAndUpdate(coords.posX, coords.posY, coords.posZ);
-            notifyOperators(sender, this, 0, "%s warped to spawn.", player.getCommandSenderName());
+            notifyOperators(sender, this, 0, "%s warped to spawn", player.getCommandSenderName());
         }
     }
 }

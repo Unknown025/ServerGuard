@@ -1,6 +1,8 @@
 package org.rainyville.serverguard.server;
 
 import net.dv8tion.jda.core.*;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.minecraft.entity.player.EntityPlayerMP;
 import org.rainyville.serverguard.ServerGuard;
@@ -67,5 +69,25 @@ public class DiscordBridge {
         builder.setColor(Color.ORANGE);
         builder.addField("Reason", reason, false);
         reportChannel.sendMessage(builder.build()).queue();
+    }
+
+    /**
+     * Logs a message.
+     *
+     * @param message Message.
+     */
+    public static void logMessage(Message message) {
+        if (reportChannel == null) return;
+        reportChannel.sendMessage(message).queue();
+    }
+
+    /**
+     * Logs a message.
+     *
+     * @param message MessageEmbed.
+     */
+    public static void logMessage(MessageEmbed message) {
+        if (reportChannel == null) return;
+        reportChannel.sendMessage(message).queue();
     }
 }
