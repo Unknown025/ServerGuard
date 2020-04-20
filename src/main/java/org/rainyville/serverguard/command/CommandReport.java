@@ -1,14 +1,17 @@
 package org.rainyville.serverguard.command;
 
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.SyntaxErrorException;
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import org.rainyville.serverguard.server.DiscordBridge;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
+
+import java.util.List;
 
 public class CommandReport extends PermissionCommandBase {
     @Override
@@ -40,7 +43,7 @@ public class CommandReport extends PermissionCommandBase {
         EntityPlayerMP originator = getCommandSenderAsPlayer(sender);
 
         if (report.getGameProfile().equals(originator.getGameProfile())) {
-            throw new CommandException("Cannot report yourself!");
+            throw new WrongUsageException("Cannot report yourself!");
         }
 
         StringBuilder reason = new StringBuilder();
@@ -51,5 +54,11 @@ public class CommandReport extends PermissionCommandBase {
         DiscordBridge.reportPlayer(report, originator, reason.toString().trim());
         originator.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.DARK_GREEN + "Reported " +
                 EnumChatFormatting.RED + report.getCommandSenderName() + EnumChatFormatting.DARK_GREEN + "!"));
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+        return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
     }
 }

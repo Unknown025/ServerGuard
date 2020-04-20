@@ -42,6 +42,8 @@ public class ServerGuard {
         event.registerServerCommand(new CommandPex());
         event.registerServerCommand(new CommandSpawn());
         event.registerServerCommand(new CommandReport());
+        event.registerServerCommand(new CommandFly());
+        event.registerServerCommand(new CommandHeal());
     }
 
     @SuppressWarnings("unchecked")

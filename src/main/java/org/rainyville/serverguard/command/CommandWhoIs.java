@@ -61,6 +61,8 @@ public class CommandWhoIs extends PermissionCommandBase {
                 EnumChatFormatting.RED + player.dimension));
         sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "IP Address: " +
                 EnumChatFormatting.GREEN + player.getPlayerIP()));
+        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Opped: " +
+                EnumChatFormatting.GREEN + player.mcServer.getConfigurationManager().canSendCommands(player.getGameProfile())));
     }
 
     @SuppressWarnings("rawtypes")

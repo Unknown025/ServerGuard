@@ -26,7 +26,7 @@ public class CommandPex extends PermissionCommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/pex <user : group>";
+        return "/pex <user|group>";
     }
 
     @Override
