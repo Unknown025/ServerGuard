@@ -48,6 +48,7 @@ public class PlayerInteractionEvents {
                         } while (rs.next());
                     }
                     rs.close();
+                    conn.close();
                 } else if (event.action == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
                     ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_break WHERE " +
                             "xPos BETWEEN " + (event.x - 5) + " AND " + (event.x + 5) +
@@ -70,6 +71,7 @@ public class PlayerInteractionEvents {
                         } while (rs.next());
                     }
                     rs.close();
+                    conn.close();
                 }
                 return;
             }

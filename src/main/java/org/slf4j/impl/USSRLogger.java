@@ -21,7 +21,7 @@ public class USSRLogger extends org.slf4j.helpers.MarkerIgnoringBase {
     public static Level defaultLogLevel = Level.INFO;
     private final String name;
     private final Logger logger;
-    private Level currentLogLevel = defaultLogLevel;
+    private final Level currentLogLevel = defaultLogLevel;
 
     public USSRLogger(String name) {
         this.name = name;

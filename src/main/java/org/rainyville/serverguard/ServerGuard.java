@@ -19,6 +19,7 @@ import org.rainyville.serverguard.server.DiscordBridge;
 import org.rainyville.serverguard.server.permission.PermissionAPI;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 import org.rainyville.serverguard.server.permission.ServerGuardPermissionHandler;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
@@ -76,6 +77,8 @@ public class ServerGuard {
         String reportChannel = configuration.getString
                 ("report_channel", "Discord", "", "Channel ID for the report channel.");
         configuration.save();
+        org.slf4j.Logger logger = LoggerFactory.getLogger("Test Log");
+        logger.info("Initializing DiscordBridge");
         DiscordBridge.initialize(token, reportChannel);
     }
 }

@@ -37,7 +37,6 @@ minecraft {
     mappings = "snapshot_20140925"
 
     srgExtra "PK: net/dv8tion/jda org/rainyville/serverguard/repack/net/dv8tion/jda"
-//    srgExtra "PK: org/sqlite org/rainyville/serverguard/repack/org/sqlite"
     srgExtra "PK: org/slf4j org/rainyville/serverguard/repack/org/slf4j"
 }
 
@@ -51,19 +50,6 @@ configurations {
 }
 
 dependencies {
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    shade 'com.googlecode.efficient-java-matrix-library:ejml:0.25'
     shade group: 'org.xerial', name: 'sqlite-jdbc', version: '3.30.1'
     shade('net.dv8tion:JDA:3.8.3_464') { exclude module: 'opus-java' }
 }

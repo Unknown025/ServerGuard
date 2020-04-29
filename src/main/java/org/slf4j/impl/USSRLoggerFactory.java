@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentMap;
  * PROJECT: ussr-bot
  */
 public class USSRLoggerFactory implements org.slf4j.ILoggerFactory {
-    private ConcurrentMap<String, Logger> loggerMap;
+    private final ConcurrentMap<String, Logger> loggerMap;
 
     public USSRLoggerFactory() {
         loggerMap = new ConcurrentHashMap<>();

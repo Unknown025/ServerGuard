@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
 
 public class PermissionAPI {
     private static final Logger LOGGER = ServerGuard.logger;
-
     private static IPermissionHandler permissionHandler = DefaultPermissionHandler.INSTANCE;
 
     /**

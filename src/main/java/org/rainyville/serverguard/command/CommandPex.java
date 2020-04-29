@@ -127,6 +127,7 @@ public class CommandPex extends PermissionCommandBase {
                 for (String group : playerHashMap) {
                     sender.addChatMessage(new ChatComponentText(group));
                 }
+                return;
             } else if (args.length == 2) {
                 String groupName = args[1];
                 ServerGuardPermissionHandler.Group group = handler.getGroup(groupName);
