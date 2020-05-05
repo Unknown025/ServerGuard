@@ -2,9 +2,12 @@ package org.rainyville.serverguard.command;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChunkCoordinates;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
+
+import java.util.List;
 
 public class CommandSpawn extends PermissionCommandBase {
     @Override
@@ -38,5 +41,11 @@ public class CommandSpawn extends PermissionCommandBase {
             player.setPositionAndUpdate(coords.posX, coords.posY, coords.posZ);
             notifyOperators(sender, this, 0, "%s warped to spawn", player.getCommandSenderName());
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+        return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
     }
 }

@@ -337,6 +337,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
          *
          * @return Returns the default group.
          */
+        @Deprecated
         public static Group getDefault() {
             Group group = GROUP_PERMISSION_MAP.get("default");
             if (group == null) {

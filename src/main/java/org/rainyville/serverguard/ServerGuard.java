@@ -77,8 +77,6 @@ public class ServerGuard {
         String reportChannel = configuration.getString
                 ("report_channel", "Discord", "", "Channel ID for the report channel.");
         configuration.save();
-        org.slf4j.Logger logger = LoggerFactory.getLogger("Test Log");
-        logger.info("Initializing DiscordBridge");
         DiscordBridge.initialize(token, reportChannel);
     }
 }
