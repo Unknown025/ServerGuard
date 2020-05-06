@@ -169,6 +169,11 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         return null;
     }
 
+    @Nullable
+    public Player getPlayer(EntityPlayer player) {
+        return getPlayer(player.getGameProfile().getName());
+    }
+
     /**
      * Adds a permission to a player.
      *
@@ -286,12 +291,14 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
         public String username;
         public List<String> permissions;
         public List<String> groups;
+        public Date lastSeen;
 
         public Player(String name) {
             this.username = name;
             this.permissions = new ArrayList<>();
             this.groups = new ArrayList<>();
             this.groups.add("default");
+            this.lastSeen = new Date();
         }
 
         /**
@@ -336,6 +343,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
          * Returns the default group, which is automatically assigned to new users.
          *
          * @return Returns the default group.
+         * @deprecated Don't need this anymore.
          */
         @Deprecated
         public static Group getDefault() {
