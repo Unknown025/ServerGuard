@@ -33,6 +33,7 @@ public class ServerGuard {
     @SidedProxy(serverSide = "org.rainyville.serverguard.proxy.CommonProxy", clientSide = "org.rainyville.serverguard.proxy.CommonProxy")
     public static CommonProxy proxy;
 
+    @SuppressWarnings("unchecked")
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandGameMode());
@@ -49,6 +50,10 @@ public class ServerGuard {
             event.registerServerCommand(new CommandReport());
             event.registerServerCommand(new CommandAdmin());
             event.registerServerCommand(new CommandInventorySee());
+            Map<String, ICommand> commandMap = MinecraftServer.getServer().getCommandManager().getCommands();
+            //Add unban alias.
+            if (commandMap.containsKey("pardon"))
+                commandMap.put("unban", commandMap.get("pardon"));
         }
     }
 

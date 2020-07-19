@@ -181,6 +181,23 @@ public class CommandPex extends PermissionCommandBase {
                     sender.addChatMessage(new ChatComponentText(String.format("%d) " + permission, (i + 1))));
                 }
             }
+        } else if (args.length == 3 && (args[2].equalsIgnoreCase("users")
+                || args[2].equalsIgnoreCase("user"))) {
+            String groupName = args[1];
+            ServerGuardPermissionHandler.Group group = handler.getGroup(groupName);
+            if (group == null) {
+                sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s permissions:"));
+                sender.addChatMessage(new ChatComponentText("   none"));
+                return;
+            }
+            sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s members:"));
+            int count = 1;
+            for (ServerGuardPermissionHandler.Player player : handler.getRegisteredPlayers().values()) {
+                if (player.groups.contains(groupName)) {
+                    sender.addChatMessage(new ChatComponentText(count + ") " + player.username));
+                    count++;
+                }
+            }
         } else if (args.length == 4) {
             String groupName = args[1];
             String permission = args[3];
@@ -192,7 +209,7 @@ public class CommandPex extends PermissionCommandBase {
                 handler.removePermissionFromGroup(groupName, permission);
                 sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + groupName + "!"));
             } else {
-                throw new WrongUsageException("/pex <user : group>");
+                throw new WrongUsageException("/pex <user|group>");
             }
         }
     }
