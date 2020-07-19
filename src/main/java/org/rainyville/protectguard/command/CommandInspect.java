@@ -27,8 +27,8 @@ public class CommandInspect extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if (!(sender instanceof EntityPlayer))
             throw new CommandException("commands.generic.exception");
-        if ((args.length == 1 && !args[0].equalsIgnoreCase("i")) || args.length != 0) {
-            throw new SyntaxErrorException("commands.generic.syntax");
+        if (args.length != 0) {
+            throw new SyntaxErrorException();
         }
         EntityPlayer player = getCommandSenderAsPlayer(sender);
         UUID id = player.getUniqueID();

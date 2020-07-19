@@ -19,7 +19,6 @@ import org.rainyville.serverguard.server.DiscordBridge;
 import org.rainyville.serverguard.server.permission.PermissionAPI;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 import org.rainyville.serverguard.server.permission.ServerGuardPermissionHandler;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
@@ -38,14 +37,18 @@ public class ServerGuard {
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandGameMode());
         event.registerServerCommand(new CommandKill());
-        event.registerServerCommand(new CommandAdmin());
         event.registerServerCommand(new CommandWhoIs());
         event.registerServerCommand(new CommandPex());
         event.registerServerCommand(new CommandSpawn());
-        event.registerServerCommand(new CommandReport());
         event.registerServerCommand(new CommandFly());
         event.registerServerCommand(new CommandHeal());
         event.registerServerCommand(new CommandSeen());
+
+        if (MinecraftServer.getServer().isDedicatedServer()) {
+            event.registerServerCommand(new CommandKickAll());
+            event.registerServerCommand(new CommandReport());
+            event.registerServerCommand(new CommandAdmin());
+        }
     }
 
     @SuppressWarnings("unchecked")

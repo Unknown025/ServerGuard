@@ -11,6 +11,10 @@ import org.apache.logging.log4j.Logger;
 import org.rainyville.protectguard.command.CommandInspect;
 import org.rainyville.protectguard.proxy.CommonProxy;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 /**
  * Main class for the ProtectGuard mod.
  */
@@ -22,6 +26,8 @@ public class ProtectGuard {
     public static final String NAME = "ProtectGuard";
     public static final Logger logger = LogManager.getLogger("ProtectGuard");
 
+    public static Connection connection;
+
     @SidedProxy(clientSide = "org.rainyville.protectguard.proxy.ClientProxy", serverSide = "org.rainyville.protectguard.proxy.CommonProxy")
     public static CommonProxy proxy;
 
@@ -31,6 +37,13 @@ public class ProtectGuard {
         proxy.registerEvents();
         proxy.init(event);
         logger.info("Registered proxies.");
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection("jdbc:sqlite:protectguard.db");
+        } catch (SQLException | ClassNotFoundException ex) {
+            logger.error("SQL error", ex);
+        }
     }
 
     @Mod.EventHandler

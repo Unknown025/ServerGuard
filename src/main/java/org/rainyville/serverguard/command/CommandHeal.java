@@ -3,9 +3,12 @@ package org.rainyville.serverguard.command;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
 import org.rainyville.serverguard.server.permission.PermissionCommandBase;
+
+import java.util.List;
 
 public class CommandHeal extends PermissionCommandBase {
     @Override
@@ -44,5 +47,11 @@ public class CommandHeal extends PermissionCommandBase {
         } else {
             throw new WrongUsageException("/heal [username]");
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+        return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
     }
 }
