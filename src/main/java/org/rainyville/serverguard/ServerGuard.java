@@ -48,6 +48,7 @@ public class ServerGuard {
             event.registerServerCommand(new CommandKickAll());
             event.registerServerCommand(new CommandReport());
             event.registerServerCommand(new CommandAdmin());
+            event.registerServerCommand(new CommandInventorySee());
         }
     }
 
@@ -66,7 +67,6 @@ public class ServerGuard {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         if (event.getSide() != Side.SERVER) return;
-        proxy.registerEvents();
         proxy.init(event);
         logger.info("Registered proxies.");
     }

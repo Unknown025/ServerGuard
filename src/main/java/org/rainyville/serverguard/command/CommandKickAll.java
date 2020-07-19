@@ -40,12 +40,12 @@ public class CommandKickAll extends PermissionCommandBase {
             }
         }
         for (Object player : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
-            ((EntityPlayerMP)player).playerNetServerHandler.kickPlayerFromServer(reason);
+            ((EntityPlayerMP) player).playerNetServerHandler.kickPlayerFromServer(reason);
         }
         if (flag) {
             notifyOperators(sender, this, "Kicked all players from the server for \"" + reason + "\"");
         } else {
-            notifyOperators(sender, this, "Kicked all players from the server.");
+            notifyOperators(sender, this, "Kicked all players from the server");
         }
     }
 
