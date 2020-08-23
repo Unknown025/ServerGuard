@@ -2,7 +2,6 @@ package org.rainyville.serverguard.command.util;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.InventoryBasic;
-import net.minecraft.item.ItemStack;
 import org.rainyville.serverguard.command.CommandInventorySee;
 
 public class InvSeeInventory extends InventoryBasic {

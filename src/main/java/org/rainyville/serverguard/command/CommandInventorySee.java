@@ -32,7 +32,7 @@ public class CommandInventorySee extends PermissionCommandBase {
 
     @Override
     public String getPermissionNode() {
-        return "protectguard.command.invsee";
+        return "serverguard.command.invsee";
     }
 
     @Override

@@ -90,4 +90,12 @@ public class DiscordBridge {
         if (reportChannel == null) return;
         reportChannel.sendMessage(message).queue();
     }
+
+    /**
+     * Retrieves the JDA instance, useful for registering events or other Discord interfaces.
+     * @return {@link JDA} instance.
+     */
+    public static JDA getJDA() {
+        return bot;
+    }
 }

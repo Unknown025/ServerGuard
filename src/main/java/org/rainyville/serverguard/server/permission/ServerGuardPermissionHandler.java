@@ -21,11 +21,12 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
     private static final HashMap<String, String> DESCRIPTION_MAP = new HashMap<>();
     private static HashMap<UUID, Player> PLAYER_PERMISSION_MAP = new HashMap<>();
     private static HashMap<String, Group> GROUP_PERMISSION_MAP = new HashMap<>();
-    private final File CONFIG_FILE;
+    private static File CONFIG_FILE;
 
     public ServerGuardPermissionHandler(File configFile) {
         CONFIG_FILE = configFile;
         reloadConfig();
+        Runtime.getRuntime().addShutdownHook(new Thread(ServerGuardPermissionHandler::saveConfig));
     }
 
     @SuppressWarnings("unchecked")
@@ -67,7 +68,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
     /**
      * Saves the configuration file.
      */
-    private void saveConfig() {
+    private static void saveConfig() {
         try {
             Writer writer = new FileWriter(CONFIG_FILE);
             Gson json = new GsonBuilder().setPrettyPrinting().create();
