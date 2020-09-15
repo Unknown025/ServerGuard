@@ -94,7 +94,7 @@ public class CommandPex extends PermissionCommandBase {
                         " (Last known username: " + set.getValue().username + ")" + EnumChatFormatting.GREEN +
                         " [" + String.join(", ", set.getValue().groups) + "]"));
             }
-        } else if (args.length == 2) {
+        } else if (args.length == 2 || args.length == 3) {
             String username = args[1];
             ServerGuardPermissionHandler.Player player = handler.getPlayer(username);
             if (player == null) {
@@ -102,20 +102,30 @@ public class CommandPex extends PermissionCommandBase {
                 sender.addChatMessage(new ChatComponentText("No information available."));
                 return;
             }
-            sender.addChatMessage(new ChatComponentText("Username: " + player.username));
-            if (player.groups.size() == 0) {
-                sender.addChatMessage(new ChatComponentText("Groups: none"));
-            } else {
-                sender.addChatMessage(new ChatComponentText("Groups:"));
-                for (String group : player.groups) {
-                    sender.addChatMessage(new ChatComponentText(" - " + group));
+            if (args.length == 2) {
+                sender.addChatMessage(new ChatComponentText("Username: " + player.username));
+                if (player.groups.size() == 0) {
+                    sender.addChatMessage(new ChatComponentText("Groups: none"));
+                } else {
+                    sender.addChatMessage(new ChatComponentText("Groups:"));
+                    for (String group : player.groups) {
+                        sender.addChatMessage(new ChatComponentText(" - " + group));
+                    }
                 }
+                sender.addChatMessage(new ChatComponentText(username + "'s permissions:"));
+                for (int i = 0; i < player.permissions.size(); i++) {
+                    String permission = player.permissions.get(i);
+                    sender.addChatMessage(new ChatComponentText(String.format("%d) %s", (i + 1), permission)));
+                }
+            } else if (args[2].equalsIgnoreCase("delete")) {
+                player = handler.removePlayer(player);
+                if (player == null)
+                    throw new PlayerNotFoundException();
+                sender.addChatMessage(new ChatComponentText("Removed " + player.username + "!"));
+            } else {
+                throw new WrongUsageException(getCommandUsage(sender));
             }
-            sender.addChatMessage(new ChatComponentText(username + "'s permissions:"));
-            for (int i = 0; i < player.permissions.size(); i++) {
-                String permission = player.permissions.get(i);
-                sender.addChatMessage(new ChatComponentText(String.format("%d) %s", (i + 1), permission)));
-            }
+
         } else if (args.length == 4 || args.length == 5) {
             String username = args[1];
             String permission = args[3];
@@ -181,8 +191,7 @@ public class CommandPex extends PermissionCommandBase {
                     sender.addChatMessage(new ChatComponentText(String.format("%d) " + permission, (i + 1))));
                 }
             }
-        } else if (args.length == 3 && (args[2].equalsIgnoreCase("users")
-                || args[2].equalsIgnoreCase("user"))) {
+        } else if (args.length == 3) {
             String groupName = args[1];
             ServerGuardPermissionHandler.Group group = handler.getGroup(groupName);
             if (group == null) {
@@ -190,13 +199,20 @@ public class CommandPex extends PermissionCommandBase {
                 sender.addChatMessage(new ChatComponentText("   none"));
                 return;
             }
-            sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s members:"));
-            int count = 1;
-            for (ServerGuardPermissionHandler.Player player : handler.getRegisteredPlayers().values()) {
-                if (player.groups.contains(groupName)) {
-                    sender.addChatMessage(new ChatComponentText(count + ") " + player.username));
-                    count++;
+            if (args[2].equalsIgnoreCase("users") || args[2].equalsIgnoreCase("user")) {
+                sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s members:"));
+                int count = 1;
+                for (ServerGuardPermissionHandler.Player player : handler.getRegisteredPlayers().values()) {
+                    if (player.groups.contains(groupName)) {
+                        sender.addChatMessage(new ChatComponentText(count + ") " + player.username));
+                        count++;
+                    }
                 }
+            } else if (args[2].equalsIgnoreCase("delete")) {
+                handler.removeGroup(groupName);
+                sender.addChatMessage(new ChatComponentText("Removed " + groupName + "!"));
+            } else {
+                throw new WrongUsageException(getCommandUsage(sender));
             }
         } else if (args.length == 4) {
             String groupName = args[1];

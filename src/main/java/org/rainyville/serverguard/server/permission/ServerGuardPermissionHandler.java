@@ -158,6 +158,11 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
     }
 
     @Nullable
+    public Group removeGroup(String name) {
+        return GROUP_PERMISSION_MAP.remove(name);
+    }
+
+    @Nullable
     public Player getPlayer(String name) {
         for (Player player : PLAYER_PERMISSION_MAP.values()) {
             if (player.username.equalsIgnoreCase(name)) {
@@ -172,7 +177,24 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
 
     @Nullable
     public Player getPlayer(EntityPlayer player) {
-        return getPlayer(player.getGameProfile().getName());
+        return PLAYER_PERMISSION_MAP.get(player.getUniqueID());
+    }
+
+    @Nullable
+    public Player removePlayer(Player player) {
+        UUID uuid = null;
+        for (Map.Entry<UUID, Player> set : PLAYER_PERMISSION_MAP.entrySet()) {
+            if (set.getValue() == player) {
+                uuid = set.getKey();
+                break;
+            }
+        }
+        return removePlayer(uuid);
+    }
+
+    @Nullable
+    public Player removePlayer(UUID uuid) {
+        return PLAYER_PERMISSION_MAP.remove(uuid);
     }
 
     /**

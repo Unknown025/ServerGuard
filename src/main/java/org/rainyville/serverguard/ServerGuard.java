@@ -62,8 +62,10 @@ public class ServerGuard {
     public void serverStarted(FMLServerStartedEvent event) {
         Map<String, ICommand> commandMap = MinecraftServer.getServer().getCommandManager().getCommands();
         for (Map.Entry<String, ICommand> set : commandMap.entrySet()) {
-            if (set.getValue() instanceof PermissionCommandBase)
+            if (set.getValue() instanceof PermissionCommandBase) {
+                ServerGuard.logger.info("Registered command " + set.getValue().getCommandName() + " with permission node " + ((PermissionCommandBase) set.getValue()).getPermissionNode());
                 continue;
+            }
             set.setValue(PermissionCommandBase.fromICommand(set.getValue()));
             ServerGuard.logger.info("Registered command " + set.getValue().getCommandName() + " with permission node " + ((PermissionCommandBase) set.getValue()).getPermissionNode());
         }
