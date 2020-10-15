@@ -19,8 +19,8 @@ import java.util.UUID;
 
 public class CommandFly extends PermissionCommandBase {
     private final Random random = new Random();
-    private final HashMap<UUID, Integer> usageMap = new HashMap<>();
-    private OffsetDateTime lastCacheReset;
+    public static final HashMap<UUID, Integer> usageMap = new HashMap<>();
+    public static OffsetDateTime lastCacheReset;
 
     @Override
     public DefaultPermissionLevel getPermissionLevel() {
@@ -49,10 +49,6 @@ public class CommandFly extends PermissionCommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
-        if (lastCacheReset.isBefore(OffsetDateTime.now().minusDays(1))) {
-            usageMap.clear();
-            lastCacheReset = OffsetDateTime.now();
-        }
         if (random.nextBoolean()) {
             sender.getEntityWorld().getGameRules().setOrCreateGameRule("winterApocalypse", "true");
         }
