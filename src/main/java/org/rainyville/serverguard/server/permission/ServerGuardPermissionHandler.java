@@ -181,6 +181,11 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
     }
 
     @Nullable
+    public Player getPlayer(UUID uuid) {
+        return PLAYER_PERMISSION_MAP.get(uuid);
+    }
+
+    @Nullable
     public Player removePlayer(Player player) {
         UUID uuid = null;
         for (Map.Entry<UUID, Player> set : PLAYER_PERMISSION_MAP.entrySet()) {

@@ -20,7 +20,7 @@ import java.util.UUID;
 public class CommandFly extends PermissionCommandBase {
     private final Random random = new Random();
     public static final HashMap<UUID, Integer> usageMap = new HashMap<>();
-    public static OffsetDateTime lastCacheReset;
+    public static OffsetDateTime lastCacheReset = OffsetDateTime.now();
 
     @Override
     public DefaultPermissionLevel getPermissionLevel() {
