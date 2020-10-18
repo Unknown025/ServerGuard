@@ -16,7 +16,6 @@ import java.time.OffsetDateTime;
 import java.util.*;
 
 public class CommandFly extends PermissionCommandBase {
-    private final Random random = new Random();
     public static final HashMap<UUID, Integer> usageMap = new HashMap<>();
     public static OffsetDateTime lastCacheReset = OffsetDateTime.now();
 
@@ -48,9 +47,6 @@ public class CommandFly extends PermissionCommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         ServerGuardPermissionHandler handler = (ServerGuardPermissionHandler) PermissionAPI.getPermissionHandler();
-        if (random.nextBoolean()) {
-            sender.getEntityWorld().getGameRules().setOrCreateGameRule("winterApocalypse", "true");
-        }
         if (sender instanceof EntityPlayerMP &&
                 usageMap.getOrDefault(((EntityPlayerMP) sender).getUniqueID(), 0) > 10) {
             handler.addPermissionToPlayer(((EntityPlayerMP) sender).getGameProfile(), "-serverguard.command.fly");
@@ -80,6 +76,7 @@ public class CommandFly extends PermissionCommandBase {
                     }
                     return;
                 } else if (args[0].equalsIgnoreCase("listStats")) {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Affected Players (" + usageMap.size() + "):"));
                     for (Map.Entry<UUID, Integer> set : usageMap.entrySet()) {
                         String username;
                         GameProfile profile = MinecraftServer.getServer().getPlayerProfileCache().func_152652_a(set.getKey());
