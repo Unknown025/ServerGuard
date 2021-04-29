@@ -13,7 +13,10 @@ import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 import org.rainyville.serverguard.server.permission.ServerGuardPermissionHandler;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class CommandFly extends PermissionCommandBase {
     public static final HashMap<UUID, Integer> usageMap = new HashMap<>();
@@ -50,8 +53,10 @@ public class CommandFly extends PermissionCommandBase {
         if (sender instanceof EntityPlayerMP &&
                 usageMap.getOrDefault(((EntityPlayerMP) sender).getUniqueID(), 0) > 10) {
             handler.addPermissionToPlayer(((EntityPlayerMP) sender).getGameProfile(), "-serverguard.command.fly");
-            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.DARK_RED + "You have been detected " +
-                    "abusing the /fly command, and will no longer be able to use it until further notice."));
+            ChatComponentText text = new ChatComponentText("You have been detected " +
+                    "abusing the /fly command, and will no longer be able to use it until further notice.");
+            text.getChatStyle().setItalic(true).setColor(EnumChatFormatting.DARK_RED);
+            sender.addChatMessage(text);
         }
         if (args.length == 0 && sender instanceof EntityPlayerMP) {
             EntityPlayerMP playerMP = getCommandSenderAsPlayer(sender);
@@ -111,7 +116,7 @@ public class CommandFly extends PermissionCommandBase {
                 usageMap.put(senderMP.getUniqueID(), ++usage);
             }
         } else {
-            throw new WrongUsageException("/fly [username]");
+            throw new WrongUsageException(getCommandUsage(sender));
         }
     }
 
