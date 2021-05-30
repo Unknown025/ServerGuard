@@ -1,0 +1,9 @@
+@ParametersAreNonnullByDefault
+@FieldsAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+package org.rainyville.serverguard.command;
+
+import mcp.MethodsReturnNonnullByDefault;
+import org.rainyville.protectguard.FieldsAreNonnullByDefault;
+
+import javax.annotation.ParametersAreNonnullByDefault;

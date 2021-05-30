@@ -1,47 +1,44 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            name = "forge"
-            url = "https://maven.rainyville.org/"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
+        maven { url = "https://maven.minecraftforge.net" }
     }
     dependencies {
-        classpath 'org.rainyville.forge.gradle:UKGradle:1.0-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
     }
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.5'
 }
 
-apply plugin: 'forge'
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven-publish'
 
 version = "1.0"
 group = "org.rainyville.serverguard" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "serverguard"
+archivesBaseName = "ServerGuard"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.7.10-10.13.4.1614-1.7.10"
+    version = "1.12-14.21.1.2443"
     runDir = "eclipse"
-    mappings = "snapshot_20140925"
+    mappings = "stable_39"
 
-    srgExtra "PK: net/dv8tion/jda org/rainyville/serverguard/repack/net/dv8tion/jda"
-    srgExtra "PK: org/slf4j org/rainyville/serverguard/repack/org/slf4j"
-}
-
-runClient {
-    args '--username', project.property('username')
+    replace '@FINGERPRINT@', project.findProperty('signSHA1')
+    replaceIn "ServerGuard.java"
+    replaceIn "ProtectGuard.java"
 }
 
 configurations {
@@ -50,17 +47,35 @@ configurations {
 }
 
 dependencies {
-    shade group: 'org.xerial', name: 'sqlite-jdbc', version: '3.30.1'
-    shade('net.dv8tion:JDA:3.8.3_464') { exclude module: 'opus-java' }
+    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.30.1'
+    implementation('net.dv8tion:JDA:4.2.1_265') { exclude module: 'opus-java' }
+    shadow('net.dv8tion:JDA:4.2.1_265') { exclude module: 'opus-java' }
 }
 
-jar {
-    configurations.shade.each { dep ->
-        from(project.zipTree(dep)) {
-            exclude 'META-INF', 'META-INF/**'
-        }
-    }
+shadowJar {
+    classifier ''
+
+    relocate 'net.dv8tion.jda', 'org.rainyville.jda'
+    relocate 'org.slf4j', 'org.rainyville.slf4j'
+    relocate 'com.iwebpp.crypto', 'org.rainyville.crypto'
+    relocate 'com.fasterxml.jackson.annotation', 'org.rainyville.jackson.annotation'
+    relocate 'com.fasterxml.jackson.core', 'org.rainyville.jackson.core'
+    relocate 'com.fasterxml.jackson.databind', 'org.rainyville.jackson.databind'
+    relocate 'com.neovisionaries.ws.client', 'org.rainyville.client'
+    relocate 'gnu.trove', 'org.rainyville.trove'
+    relocate 'javax.annotation', 'org.rainyville.javax.annotation'
+    relocate 'okhttp3', 'org.rainyville.okhttp3'
+    relocate 'okio', 'org.rainyville.okio'
+    relocate 'org.apache.commons.collections4', 'org.rainyville.collections4'
+    relocate 'org.intellij.lang.annotations', 'org.rainyville.intellij.lang.annotations'
+    relocate 'org.jetbrains.annotations', 'org.rainyville.jetbrains.annotations'
 }
+
+reobf {
+    shadowJar {}
+}
+
+tasks.reobfShadowJar.mustRunAfter shadowJar
 
 processResources
         {
@@ -81,3 +96,64 @@ processResources
                 exclude 'mcmod.info'
             }
         }
+
+task signJar(type: SignJar, dependsOn: reobfJar) {
+    onlyIf {
+        project.hasProperty('keyStore')
+    }
+
+    keyStore = project.findProperty('keyStore')
+    alias = project.findProperty('keyStoreAlias')
+    storePass = project.findProperty('keyStorePass')
+    keyPass = project.findProperty('keyStoreKeyPass')
+
+    inputFile = new File("build/libs/${archivesBaseName}-${version}.jar")
+    outputFile = new File("build/libs/${archivesBaseName}-${version}.jar")
+}
+
+build {
+    dependsOn reobfShadowJar
+    dependsOn signJar
+}
+
+task srcJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+    archiveName = "${baseName}-${version}-sources.${extension}"
+}
+
+task deobfJar(type: Jar) {
+    classifier = "deobf"
+    from sourceSets.main.output
+    archiveName = "${baseName}-${version}-deobf.${extension}"
+}
+
+artifacts {
+    archives deobfJar
+    archives srcJar
+}
+
+publishing {
+    publications {
+        library(MavenPublication) {
+            from components.java
+
+            artifact sourceJar
+            artifact deobfJar
+
+            version = project.minecraft.version + '-' + project.version
+        }
+    }
+
+    repositories {
+        maven {
+            credentials {
+                username = project.hasProperty('username') ? project.property('username') : null
+                password = project.hasProperty('password') ? project.property('password') : null
+            }
+
+            name = 'Rainyville'
+            url = 'https://maven.rainyville.org/'
+        }
+    }
+}

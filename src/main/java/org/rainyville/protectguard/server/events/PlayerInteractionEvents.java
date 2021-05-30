@@ -1,12 +1,13 @@
 package org.rainyville.protectguard.server.events;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.rainyville.protectguard.ProtectGuard;
 import org.rainyville.protectguard.command.CommandInspect;
 
@@ -17,61 +18,80 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class PlayerInteractionEvents {
+    //TODO: [BUG] event gets called twice.
     @SubscribeEvent
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        try {
-            Statement stat = ProtectGuard.connection.createStatement();
+    public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        MinecraftServer server = event.getWorld().getMinecraftServer();
+        BlockPos pos = event.getPos();
+        if (server == null || !event.getSide().isServer()) return;
 
-            if (CommandInspect.enabledInspector.contains(event.entityPlayer.getUniqueID())) {
+        try {
+            if (CommandInspect.enabledInspector.contains(event.getEntityPlayer().getUniqueID())) {
                 event.setCanceled(true);
-                if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-                    ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_place WHERE " +
-                            "xPos BETWEEN " + (event.x - 5) + " AND " + (event.x + 5) +
-                            " AND yPos BETWEEN " + (event.y - 5) + " AND " + (event.y + 5) +
-                            " AND zPos BETWEEN " + (event.z - 5) + " AND " + (event.z + 5) + ";");
-                    if (!rs.next()) {
-                        event.entityPlayer.addChatComponentMessage(new ChatComponentText("No data available."));
-                    } else {
-                        do {
-                            String username = MinecraftServer.getServer().getPlayerProfileCache().func_152652_a(UUID.fromString(rs.getString("uuid"))).getName();
-                            LocalDateTime timestamp = rs.getTimestamp("time").toLocalDateTime();
-                            String time = timestamp.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-                            String blockId = rs.getString("blockId");
-                            int xPos = rs.getInt("xPos");
-                            int yPos = rs.getInt("yPos");
-                            int zPos = rs.getInt("zPos");
-                            String message = String.format(EnumChatFormatting.GOLD + "Player " + EnumChatFormatting.YELLOW + "%s" + EnumChatFormatting.GOLD + " placed block with ID " + EnumChatFormatting.ITALIC + EnumChatFormatting.GREEN + "%s " +
-                                    EnumChatFormatting.GOLD + "at " + EnumChatFormatting.BLUE + "%s " + EnumChatFormatting.GOLD + "(x: %d, y: %d, z: %d).", username, blockId, time, xPos, yPos, zPos);
-                            event.entityPlayer.addChatComponentMessage(new ChatComponentText(message));
-                        } while (rs.next());
-                    }
-                    rs.close();
-                } else if (event.action == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
-                    ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_break WHERE " +
-                            "xPos BETWEEN " + (event.x - 5) + " AND " + (event.x + 5) +
-                            " AND yPos BETWEEN " + (event.y - 5) + " AND " + (event.y + 5) +
-                            " AND zPos BETWEEN " + (event.z - 5) + " AND " + (event.z + 5) + ";");
-                    if (!rs.next()) {
-                        event.entityPlayer.addChatComponentMessage(new ChatComponentText("No data available."));
-                    } else {
-                        do {
-                            String username = MinecraftServer.getServer().getPlayerProfileCache().func_152652_a(UUID.fromString(rs.getString("uuid"))).getName();
-                            LocalDateTime timestamp = rs.getTimestamp("time").toLocalDateTime();
-                            String time = timestamp.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-                            String blockId = rs.getString("blockId");
-                            int xPos = rs.getInt("xPos");
-                            int yPos = rs.getInt("yPos");
-                            int zPos = rs.getInt("zPos");
-                            String message = String.format(EnumChatFormatting.GOLD + "Player " + EnumChatFormatting.YELLOW + "%s" + EnumChatFormatting.GOLD + " destroyed block with ID " + EnumChatFormatting.ITALIC + EnumChatFormatting.RED + "%s " +
-                                    EnumChatFormatting.GOLD + "at " + EnumChatFormatting.BLUE + "%s " + EnumChatFormatting.GOLD + "(x: %d, y: %d, z: %d).", username, blockId, time, xPos, yPos, zPos);
-                            event.entityPlayer.addChatComponentMessage(new ChatComponentText(message));
-                        } while (rs.next());
-                    }
-                    rs.close();
+
+                Statement stat = ProtectGuard.connection.createStatement();
+                ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_place WHERE " +
+                        "xPos BETWEEN " + (pos.getX() - 5) + " AND " + (pos.getX() + 5) +
+                        " AND yPos BETWEEN " + (pos.getY() - 5) + " AND " + (pos.getY() + 5) +
+                        " AND zPos BETWEEN " + (pos.getZ() - 5) + " AND " + (pos.getZ() + 5) + ";");
+                if (!rs.next()) {
+                    event.getEntityPlayer().sendMessage(new TextComponentString(TextFormatting.GREEN + "No data available."));
+                } else {
+                    do {
+                        String username = server.getPlayerProfileCache().getProfileByUUID(UUID.fromString(rs.getString("uuid"))).getName();
+                        LocalDateTime timestamp = rs.getTimestamp("time").toLocalDateTime();
+                        String time = timestamp.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+                        String blockId = rs.getString("blockId");
+                        int xPos = rs.getInt("xPos");
+                        int yPos = rs.getInt("yPos");
+                        int zPos = rs.getInt("zPos");
+                        String message = String.format(TextFormatting.GOLD + "Player " + TextFormatting.YELLOW + "%s" + TextFormatting.GOLD + " placed block with ID " + TextFormatting.ITALIC + TextFormatting.GREEN + "%s " +
+                                TextFormatting.GOLD + "at " + TextFormatting.BLUE + "%s " + TextFormatting.GOLD + "(x: %d, y: %d, z: %d).", username, blockId, time, xPos, yPos, zPos);
+                        event.getEntityPlayer().sendMessage(new TextComponentString(message));
+                    } while (rs.next());
                 }
+                rs.close();
             }
         } catch (Exception ex) {
-            ProtectGuard.logger.error("Exception occurred while executing a database query", ex);
+            ProtectGuard.logger.error("Error occurred while executing a database query", ex);
+        }
+    }
+
+    @SubscribeEvent
+    public void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        MinecraftServer server = event.getWorld().getMinecraftServer();
+        BlockPos pos = event.getPos();
+        if (server == null || !event.getSide().isServer()) return;
+
+        try {
+            if (CommandInspect.enabledInspector.contains(event.getEntityPlayer().getUniqueID())) {
+                event.setCanceled(true);
+
+                Statement stat = ProtectGuard.connection.createStatement();
+                ResultSet rs = stat.executeQuery("SELECT * FROM protectguard_break WHERE " +
+                        "xPos BETWEEN " + (pos.getX() - 5) + " AND " + (pos.getX() + 5) +
+                        " AND yPos BETWEEN " + (pos.getY() - 5) + " AND " + (pos.getY() + 5) +
+                        " AND zPos BETWEEN " + (pos.getZ() - 5) + " AND " + (pos.getZ() + 5) + ";");
+                if (!rs.next()) {
+                    event.getEntityPlayer().sendMessage(new TextComponentString(TextFormatting.GREEN + "No data available."));
+                } else {
+                    do {
+                        String username = server.getPlayerProfileCache().getProfileByUUID(UUID.fromString(rs.getString("uuid"))).getName();
+                        LocalDateTime timestamp = rs.getTimestamp("time").toLocalDateTime();
+                        String time = timestamp.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+                        String blockId = rs.getString("blockId");
+                        int xPos = rs.getInt("xPos");
+                        int yPos = rs.getInt("yPos");
+                        int zPos = rs.getInt("zPos");
+                        String message = String.format(TextFormatting.GOLD + "Player " + TextFormatting.YELLOW + "%s" + TextFormatting.GOLD + " destroyed block with ID " + TextFormatting.ITALIC + TextFormatting.RED + "%s " +
+                                TextFormatting.GOLD + "at " + TextFormatting.BLUE + "%s " + TextFormatting.GOLD + "(x: %d, y: %d, z: %d).", username, blockId, time, xPos, yPos, zPos);
+                        event.getEntityPlayer().sendMessage(new TextComponentString(message));
+                    } while (rs.next());
+                }
+                rs.close();
+            }
+        } catch (Exception ex) {
+            ProtectGuard.logger.error("Error occurred while executing a database query", ex);
         }
     }
 
@@ -83,6 +103,7 @@ public class PlayerInteractionEvents {
                 return;
             }
 
+            BlockPos pos = event.getPos();
             Statement stat = ProtectGuard.connection.createStatement();
 
             stat.executeUpdate("create table if not exists protectguard_break (" +
@@ -96,17 +117,19 @@ public class PlayerInteractionEvents {
             PreparedStatement prep = ProtectGuard.connection.prepareStatement(
                     "insert into protectguard_break values (?, ?, ?, ?, ?, ?);");
 
-            prep.setInt(1, event.x);
-            prep.setInt(2, event.y);
-            prep.setInt(3, event.z);
+            prep.setInt(1, pos.getX());
+            prep.setInt(2, pos.getY());
+            prep.setInt(3, pos.getZ());
             prep.setString(4, event.getPlayer().getUniqueID().toString());
-            prep.setString(5, Block.blockRegistry.getNameForObject(event.block));
+            prep.setString(5, Block.REGISTRY.getNameForObject(event.getState().getBlock()).toString());
             prep.setTimestamp(6, Timestamp.from(Instant.now()));
             prep.addBatch();
 
             ProtectGuard.connection.setAutoCommit(false);
             prep.executeBatch();
             ProtectGuard.connection.setAutoCommit(true);
+
+            clearHistory();
         } catch (Exception ex) {
             ProtectGuard.logger.error("Exception occurred while executing a database query", ex);
         }
@@ -115,11 +138,12 @@ public class PlayerInteractionEvents {
     @SubscribeEvent
     public void onBlockPlace(BlockEvent.PlaceEvent event) {
         try {
-            if (CommandInspect.enabledInspector.contains(event.player.getUniqueID())) {
+            if (CommandInspect.enabledInspector.contains(event.getPlayer().getUniqueID())) {
                 event.setCanceled(true);
                 return;
             }
 
+            BlockPos pos = event.getPos();
             Statement stat = ProtectGuard.connection.createStatement();
 
             stat.executeUpdate("create table if not exists protectguard_place (" +
@@ -133,19 +157,24 @@ public class PlayerInteractionEvents {
             PreparedStatement prep = ProtectGuard.connection.prepareStatement(
                     "insert into protectguard_place values (?, ?, ?, ?, ?, ?);");
 
-            prep.setInt(1, event.x);
-            prep.setInt(2, event.y);
-            prep.setInt(3, event.z);
-            prep.setString(4, event.player.getUniqueID().toString());
-            prep.setString(5, Block.blockRegistry.getNameForObject(event.block));
+            prep.setInt(1, pos.getX());
+            prep.setInt(2, pos.getY());
+            prep.setInt(3, pos.getZ());
+            prep.setString(4, event.getPlayer().getUniqueID().toString());
+            prep.setString(5, Block.REGISTRY.getNameForObject(event.getPlacedBlock().getBlock()).toString());
             prep.setTimestamp(6, Timestamp.from(Instant.now()));
             prep.addBatch();
 
             ProtectGuard.connection.setAutoCommit(false);
             prep.executeBatch();
             ProtectGuard.connection.setAutoCommit(true);
+
+            clearHistory();
         } catch (Exception ex) {
             ProtectGuard.logger.error("Exception occurred while executing a database query", ex);
         }
     }
+
+    //TODO: Implement passive clearing of old database data older than 48 hours.
+    private void clearHistory() {}
 }

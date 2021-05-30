@@ -1,8 +1,8 @@
 package org.rainyville.protectguard.proxy;
 
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.rainyville.protectguard.server.events.PlayerInteractionEvents;
 
 public class CommonProxy {

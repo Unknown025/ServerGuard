@@ -1,30 +1,22 @@
 package org.rainyville.serverguard;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartedEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.relauncher.Side;
 import net.minecraft.command.ICommand;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.rainyville.serverguard.command.*;
+import org.rainyville.serverguard.command.CommandReport;
 import org.rainyville.serverguard.proxy.CommonProxy;
 import org.rainyville.serverguard.server.DiscordBridge;
-import org.rainyville.serverguard.server.permission.PermissionAPI;
-import org.rainyville.serverguard.server.permission.PermissionCommandBase;
-import org.rainyville.serverguard.server.permission.ServerGuardPermissionHandler;
 
-import java.io.File;
 import java.util.Map;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-@Mod(modid = ServerGuard.MODID, version = ServerGuard.VERSION, acceptableRemoteVersions = "*")
+@Mod(modid = ServerGuard.MODID, version = ServerGuard.VERSION, acceptableRemoteVersions = "*", certificateFingerprint = "@FINGERPRINT@")
 public class ServerGuard {
     public static final String MODID = "serverguard";
     public static final String VERSION = "1.0";
@@ -33,55 +25,25 @@ public class ServerGuard {
     @SidedProxy(serverSide = "org.rainyville.serverguard.proxy.CommonProxy", clientSide = "org.rainyville.serverguard.proxy.CommonProxy")
     public static CommonProxy proxy;
 
-    @SuppressWarnings("unchecked")
-    @EventHandler
+    @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
-        event.registerServerCommand(new CommandGameMode());
-        event.registerServerCommand(new CommandKill());
-        event.registerServerCommand(new CommandWhoIs());
-        event.registerServerCommand(new CommandPex());
-        event.registerServerCommand(new CommandSpawn());
-        event.registerServerCommand(new CommandFly());
-        event.registerServerCommand(new CommandHeal());
-        event.registerServerCommand(new CommandSeen());
-
-        if (MinecraftServer.getServer().isDedicatedServer()) {
-            event.registerServerCommand(new CommandKickAll());
+        if (event.getServer().isDedicatedServer()) {
             event.registerServerCommand(new CommandReport());
-            event.registerServerCommand(new CommandAdmin());
-            event.registerServerCommand(new CommandInventorySee());
-            Map<String, ICommand> commandMap = MinecraftServer.getServer().getCommandManager().getCommands();
+            Map<String, ICommand> commandMap = event.getServer().getCommandManager().getCommands();
             //Add unban alias.
             if (commandMap.containsKey("pardon"))
                 commandMap.put("unban", commandMap.get("pardon"));
         }
     }
 
-    @SuppressWarnings("unchecked")
-    @EventHandler
-    public void serverStarted(FMLServerStartedEvent event) {
-        Map<String, ICommand> commandMap = MinecraftServer.getServer().getCommandManager().getCommands();
-        for (Map.Entry<String, ICommand> set : commandMap.entrySet()) {
-            if (set.getValue() instanceof PermissionCommandBase) {
-                ServerGuard.logger.info("Registered command " + set.getValue().getCommandName() + " with permission node " + ((PermissionCommandBase) set.getValue()).getPermissionNode());
-                continue;
-            }
-            set.setValue(PermissionCommandBase.fromICommand(set.getValue()));
-            ServerGuard.logger.info("Registered command " + set.getValue().getCommandName() + " with permission node " + ((PermissionCommandBase) set.getValue()).getPermissionNode());
-        }
-    }
-
-    @EventHandler
+    @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        if (event.getSide() != Side.SERVER) return;
         proxy.init(event);
         logger.info("Registered proxies.");
     }
 
-    @EventHandler
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        PermissionAPI.setPermissionHandler(
-                new ServerGuardPermissionHandler(new File(event.getModConfigurationDirectory(), "permissions.json")));
         Configuration configuration = new Configuration(event.getSuggestedConfigurationFile());
         String token = configuration.getString
                 ("token", "Discord", "", "The token for Discord bot functionality.");

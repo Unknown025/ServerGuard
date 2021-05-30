@@ -1,45 +1,33 @@
 package org.rainyville.serverguard.command;
 
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.SyntaxErrorException;
-import net.minecraft.command.WrongUsageException;
+import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import org.rainyville.serverguard.server.DiscordBridge;
-import org.rainyville.serverguard.server.permission.DefaultPermissionLevel;
-import org.rainyville.serverguard.server.permission.PermissionCommandBase;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class CommandReport extends PermissionCommandBase {
+public class CommandReport extends CommandBase {
     @Override
-    public DefaultPermissionLevel getPermissionLevel() {
-        return DefaultPermissionLevel.ALL;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Allows players to report each other.";
-    }
-
-    @Override
-    public String getPermissionNode() {
-        return "serverguard.command.report";
-    }
-
-    @Override
-    public String getCommandName() {
+    public String getName() {
         return "report";
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public String getUsage(ICommandSender sender) {
+        return "/report <player> <reason>";
+    }
+
+    @Override
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if (args.length < 2) {
-            throw new SyntaxErrorException("/report <player> <reason>");
+            throw new WrongUsageException(getUsage(sender));
         }
-        EntityPlayerMP report = getPlayer(sender, args[0]);
+        EntityPlayerMP report = getPlayer(server, sender, args[0]);
         EntityPlayerMP originator = getCommandSenderAsPlayer(sender);
 
         if (report.getGameProfile().equals(originator.getGameProfile())) {
@@ -52,13 +40,12 @@ public class CommandReport extends PermissionCommandBase {
             reason.append(" ");
         }
         DiscordBridge.reportPlayer(report, originator, reason.toString().trim());
-        originator.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.DARK_GREEN + "Reported " +
-                EnumChatFormatting.RED + report.getCommandSenderName() + EnumChatFormatting.DARK_GREEN + "!"));
+        originator.sendMessage(new TextComponentString(TextFormatting.DARK_GREEN + "Reported " +
+                TextFormatting.RED + report.getName() + TextFormatting.DARK_GREEN + "!"));
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
-        return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
+        return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
     }
 }

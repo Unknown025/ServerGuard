@@ -1,11 +1,10 @@
 package org.rainyville.protectguard;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rainyville.protectguard.command.CommandInspect;
@@ -19,7 +18,7 @@ import java.sql.SQLException;
  * Main class for the ProtectGuard mod.
  */
 @SuppressWarnings("unused")
-@Mod(modid = ProtectGuard.MODID, version = ProtectGuard.VERSION, name = ProtectGuard.NAME, acceptableRemoteVersions = "*")
+@Mod(modid = ProtectGuard.MODID, version = ProtectGuard.VERSION, name = ProtectGuard.NAME, acceptableRemoteVersions = "*", acceptedMinecraftVersions = "[1.12, 1.12.2]", certificateFingerprint = "@FINGERPRINT@")
 public class ProtectGuard {
     public static final String MODID = "protectguard";
     public static final String VERSION = "1.0";
@@ -33,7 +32,6 @@ public class ProtectGuard {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        if (event.getSide() != Side.SERVER) return;
         proxy.registerEvents();
         proxy.init(event);
         logger.info("Registered proxies.");

@@ -1,9 +1,9 @@
 package org.rainyville.serverguard.server;
 
-import net.dv8tion.jda.core.*;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.api.*;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.minecraft.entity.player.EntityPlayerMP;
 import org.rainyville.serverguard.ServerGuard;
 
@@ -28,8 +28,8 @@ public class DiscordBridge {
     public static void initialize(String token) {
         if (token == null || token.isEmpty()) return;
         try {
-            bot = new JDABuilder(AccountType.BOT).setToken(token).build();
-            ServerGuard.logger.info("Discord bot invite link: " + bot.asBot().getInviteUrl(Permission.ADMINISTRATOR));
+            bot = JDABuilder.createDefault(token).setStatus(OnlineStatus.ONLINE).build();
+            ServerGuard.logger.info("Discord bot invite link: " + bot.getInviteUrl(Permission.ADMINISTRATOR));
         } catch (LoginException e) {
             ServerGuard.logger.error("Exception when initializing DiscordBridge!", e);
         }
@@ -64,8 +64,8 @@ public class DiscordBridge {
     public static void reportPlayer(EntityPlayerMP reported, EntityPlayerMP originator, String reason) {
         if (reportChannel == null) return;
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setAuthor(originator.getCommandSenderName());
-        builder.setTitle(reported.getCommandSenderName() + " Reported");
+        builder.setAuthor(originator.getName());
+        builder.setTitle(reported.getName() + " Reported");
         builder.setColor(Color.ORANGE);
         builder.addField("Reason", reason, false);
         reportChannel.sendMessage(builder.build()).queue();
