@@ -1,9 +1,9 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven {
             name = "forge"
-            url = "https://maven.rainyville.org/"
+            url = "https://maven.minecraftforge.net/"
         }
         maven {
             name = "sonatype"
@@ -11,16 +11,15 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.rainyville.forge.gradle:UKGradle:1.0-SNAPSHOT'
+        // Requires Gradle 4+
+        classpath('com.anatawa12.forge:ForgeGradle:1.2-1.1.+') {
+            changing = true
+        }
     }
 }
 
 repositories {
     jcenter()
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.5'
 }
 
 apply plugin: 'forge'
