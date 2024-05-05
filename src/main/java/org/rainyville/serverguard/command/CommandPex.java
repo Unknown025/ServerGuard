@@ -91,8 +91,8 @@ public class CommandPex extends PermissionCommandBase {
             HashMap<UUID, ServerGuardPermissionHandler.Player> playerHashMap = handler.getRegisteredPlayers();
             for (Map.Entry<UUID, ServerGuardPermissionHandler.Player> set : playerHashMap.entrySet()) {
                 sender.addChatMessage(new ChatComponentText(set.getKey() +
-                        " (Last known username: " + set.getValue().username + ")" + EnumChatFormatting.GREEN +
-                        " [" + String.join(", ", set.getValue().groups) + "]"));
+                        " (Last known username: " + set.getValue().getUsername() + ")" + EnumChatFormatting.GREEN +
+                        " [" + String.join(", ", set.getValue().getGroupNames()) + "]"));
             }
         } else if (args.length == 2 || args.length == 3) {
             String username = args[1];
@@ -102,26 +102,31 @@ public class CommandPex extends PermissionCommandBase {
                 sender.addChatMessage(new ChatComponentText("No information available."));
                 return;
             }
-            if (args.length == 2) {
-                sender.addChatMessage(new ChatComponentText("Username: " + player.username));
-                if (player.groups.size() == 0) {
+            if (args.length == 2 || args[2].equalsIgnoreCase("groups")) {
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Username: " + EnumChatFormatting.GREEN + player.getUsername()
+                        + (!player.usernames.isEmpty() ? EnumChatFormatting.DARK_GREEN + " [" + EnumChatFormatting.WHITE + String.join(", ", player.usernames) + EnumChatFormatting.DARK_GREEN + "]" : "")));
+                if (player.groups.isEmpty()) {
                     sender.addChatMessage(new ChatComponentText("Groups: none"));
                 } else {
                     sender.addChatMessage(new ChatComponentText("Groups:"));
-                    for (String group : player.groups) {
-                        sender.addChatMessage(new ChatComponentText(" - " + group));
+                    for (ServerGuardPermissionHandler.Group group : player.groups) {
+                        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + " - " + EnumChatFormatting.DARK_AQUA + group.name));
                     }
                 }
-                sender.addChatMessage(new ChatComponentText(username + "'s permissions:"));
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + player.getUsername() + EnumChatFormatting.GOLD + "'s permissions:"));
                 for (int i = 0; i < player.permissions.size(); i++) {
                     String permission = player.permissions.get(i);
-                    sender.addChatMessage(new ChatComponentText(String.format("%d) %s", (i + 1), permission)));
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + String.format("%d) ", (i + 1))
+                            + EnumChatFormatting.GRAY + permission));
+                }
+                if (player.permissions.isEmpty()) {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + " - " + EnumChatFormatting.GRAY + "none"));
                 }
             } else if (args[2].equalsIgnoreCase("delete")) {
                 player = handler.removePlayer(player);
                 if (player == null)
                     throw new PlayerNotFoundException();
-                sender.addChatMessage(new ChatComponentText("Removed " + player.username + "!"));
+                sender.addChatMessage(new ChatComponentText("Removed " + player.getUsername() + "!"));
             } else {
                 throw new WrongUsageException(getCommandUsage(sender));
             }
@@ -145,10 +150,10 @@ public class CommandPex extends PermissionCommandBase {
                 String groupName = args[4];
                 if (args[3].equalsIgnoreCase("add")) {
                     handler.addGroupToPlayer(profile, groupName);
-                    sender.addChatMessage(new ChatComponentText("Added \"" + groupName + "\" to " + username + "!"));
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Added \"" + groupName + "\" to " + username + "!"));
                 } else if (args[3].equalsIgnoreCase("remove")) {
                     handler.removeGroupFromPlayer(profile, groupName);
-                    sender.addChatMessage(new ChatComponentText("Removed \"" + groupName + "\" from " + username + "!"));
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA + "Removed \"" + groupName + "\" from " + username + "!"));
                 } else {
                     throw new WrongUsageException("Invalid command syntax.");
                 }
@@ -157,62 +162,77 @@ public class CommandPex extends PermissionCommandBase {
 
             if (args[2].equalsIgnoreCase("add")) {
                 handler.addPermissionToPlayer(profile, permission);
-                sender.addChatMessage(new ChatComponentText("Added \"" + permission + "\" to " + username + "!"));
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Added \"" + permission + "\" to " + username + "!"));
             } else if (args[2].equalsIgnoreCase("remove")) {
                 handler.removePermissionFromPlayer(profile, permission);
-                sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + username + "!"));
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Removed \"" + permission + "\" from " + username + "!"));
             } else {
                 throw new WrongUsageException("Invalid command syntax.");
             }
+        } else {
+            throw new WrongUsageException("/pex <user|group>");
         }
     }
 
     private void handleGroups(ICommandSender sender, String[] args) {
         if (args.length == 1) {
-            sender.addChatMessage(new ChatComponentText("Registered groups:"));
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Registered groups:"));
             Set<String> playerHashMap = handler.getRegisteredGroups();
             for (String group : playerHashMap) {
-                sender.addChatMessage(new ChatComponentText(group));
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + " - " + EnumChatFormatting.DARK_AQUA + group));
             }
-        } else if (args.length == 2) {
+        } else if (args.length < 4) {
             String groupName = args[1];
             ServerGuardPermissionHandler.Group group = handler.getGroup(groupName);
-            if (group == null) {
-                sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s permissions:"));
-                sender.addChatMessage(new ChatComponentText("   none"));
-                return;
-            }
-            sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s permissions:"));
-            if (group.permissions.size() == 0) {
-                sender.addChatMessage(new ChatComponentText("   none"));
-            } else {
-                for (int i = 0; i < group.permissions.size(); i++) {
-                    String permission = group.permissions.get(i);
-                    sender.addChatMessage(new ChatComponentText(String.format("%d) " + permission, (i + 1))));
-                }
-            }
-        } else if (args.length == 3) {
-            String groupName = args[1];
-            ServerGuardPermissionHandler.Group group = handler.getGroup(groupName);
-            if (group == null) {
-                sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s permissions:"));
-                sender.addChatMessage(new ChatComponentText("   none"));
-                return;
-            }
-            if (args[2].equalsIgnoreCase("users") || args[2].equalsIgnoreCase("user")) {
-                sender.addChatMessage(new ChatComponentText("Group \"" + groupName + "\"'s members:"));
-                int count = 1;
-                for (ServerGuardPermissionHandler.Player player : handler.getRegisteredPlayers().values()) {
-                    if (player.groups.contains(groupName)) {
-                        sender.addChatMessage(new ChatComponentText(count + ") " + player.username));
-                        count++;
+
+            if (args.length == 2) {
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Group \"" + EnumChatFormatting.GREEN
+                        + groupName + EnumChatFormatting.GOLD + "\"'s permissions:"));
+                if (group == null || group.permissions.isEmpty()) {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "   none"));
+                } else {
+                    for (int i = 0; i < group.permissions.size(); i++) {
+                        String permission = group.permissions.get(i);
+                        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + String.format("%d) " +
+                                EnumChatFormatting.GRAY + permission, (i + 1))));
                     }
                 }
-            } else if (args[2].equalsIgnoreCase("delete")) {
-                handler.removeGroup(groupName);
-                sender.addChatMessage(new ChatComponentText("Removed " + groupName + "!"));
             } else {
-                throw new WrongUsageException(getCommandUsage(sender));
+                if (args[2].equalsIgnoreCase("users") || args[2].equalsIgnoreCase("user")) {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Group \"" + EnumChatFormatting.GREEN
+                            + groupName + EnumChatFormatting.GOLD + "\"'s members:"));
+                    int count = 1;
+                    for (ServerGuardPermissionHandler.Player player : handler.getRegisteredPlayers().values()) {
+                        if (player.groups.contains(group)) {
+                            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + String.valueOf(count) + ") "
+                                    + EnumChatFormatting.GRAY + player.getUsername()));
+                            count++;
+                        }
+                    }
+                } else if (args[2].equalsIgnoreCase("delete")) {
+                    ServerGuardPermissionHandler.Group remGroup = handler.removeGroup(groupName);
+                    if (remGroup != null)
+                        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Removed " + groupName + "!"));
+                    else
+                        throw new CommandException("Group \"" + groupName + "\" not found!");
+                } else if (args[2].equalsIgnoreCase("prefix")) {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Prefix:"));
+                    if (group == null || group.prefix == null)
+                        sender.addChatMessage(new ChatComponentText("None"));
+                    else
+                        sender.addChatMessage(new ChatComponentText(group.prefix));
+                } else if (args[2].equalsIgnoreCase("suffix")) {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Suffix:"));
+                    if (group == null || group.suffix == null)
+                        sender.addChatMessage(new ChatComponentText("None"));
+                    else
+                        sender.addChatMessage(new ChatComponentText(group.prefix));
+                } else if (args[2].equalsIgnoreCase("rank")) {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD + "Rank: " + EnumChatFormatting.AQUA
+                            + (group == null || group.rank == null ? "unranked" : group.rank)));
+                } else {
+                    throw new WrongUsageException(getCommandUsage(sender));
+                }
             }
         } else if (args.length == 4) {
             String groupName = args[1];
@@ -220,13 +240,25 @@ public class CommandPex extends PermissionCommandBase {
 
             if (args[2].equalsIgnoreCase("add")) {
                 handler.addPermissionToGroup(groupName, permission);
-                sender.addChatMessage(new ChatComponentText("Added \"" + permission + "\" to " + groupName + "!"));
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Added \"" + permission + "\" to " + groupName + "!"));
             } else if (args[2].equalsIgnoreCase("remove")) {
                 handler.removePermissionFromGroup(groupName, permission);
-                sender.addChatMessage(new ChatComponentText("Removed \"" + permission + "\" from " + groupName + "!"));
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Removed \"" + permission + "\" from " + groupName + "!"));
+            } else if (args[2].equalsIgnoreCase("prefix")) {
+                handler.setGroupPrefix(groupName, permission);
+                sender.addChatMessage(new ChatComponentText("Set group " + groupName + "'s prefix to: " + permission));
+            } else if (args[2].equalsIgnoreCase("suffix")) {
+                handler.setGroupSuffix(groupName, permission);
+                sender.addChatMessage(new ChatComponentText("Set group " + groupName + "'s suffix to: " + permission));
+            } else if (args[2].equalsIgnoreCase("rank")) {
+                int rank = parseInt(sender, args[3]);
+                handler.setGroupRank(groupName, rank);
+                sender.addChatMessage(new ChatComponentText("Set group " + groupName + "'s rank to: " + rank));
             } else {
                 throw new WrongUsageException("/pex <user|group>");
             }
+        } else {
+            throw new WrongUsageException("/pex <user|group>");
         }
     }
 }
