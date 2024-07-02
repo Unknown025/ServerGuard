@@ -18,6 +18,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ServerGuardPermissionHandler implements IPermissionHandler {
     public static final String DEFAULT_GROUP = "default";
@@ -447,7 +448,7 @@ public class ServerGuardPermissionHandler implements IPermissionHandler {
             this.uuid = internal.uuid;
             this.usernames = new ArrayList<>();
             if (internal.usernames != null)
-                this.usernames.addAll(internal.usernames);
+                this.usernames.addAll(internal.usernames.stream().filter(Objects::nonNull).collect(Collectors.toList()));
             if (internal.username != null && !this.usernames.contains(internal.username))
                 this.usernames.add(0, internal.username);
             this.permissions = new ArrayList<>();

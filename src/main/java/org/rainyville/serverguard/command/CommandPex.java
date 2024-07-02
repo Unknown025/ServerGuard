@@ -91,7 +91,7 @@ public class CommandPex extends PermissionCommandBase {
             HashMap<UUID, ServerGuardPermissionHandler.Player> playerHashMap = handler.getRegisteredPlayers();
             for (Map.Entry<UUID, ServerGuardPermissionHandler.Player> set : playerHashMap.entrySet()) {
                 sender.addChatMessage(new ChatComponentText(set.getKey() +
-                        " (Last known username: " + set.getValue().getUsername() + ")" + EnumChatFormatting.GREEN +
+                        (set.getValue().getUsername() != null ? " (Last known username: " + set.getValue().getUsername() + ")" : "") + EnumChatFormatting.GREEN +
                         " [" + String.join(", ", set.getValue().getGroupNames()) + "]"));
             }
         } else if (args.length == 2 || args.length == 3) {
