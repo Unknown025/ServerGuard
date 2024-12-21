@@ -19,6 +19,7 @@ import java.awt.*;
 public class DiscordBridge {
     private static JDA bot = null;
     private static TextChannel reportChannel = null;
+    private static TextChannel uptimeChannel = null;
 
     /**
      * Initializes the DiscordBridge.
@@ -29,9 +30,9 @@ public class DiscordBridge {
         if (token == null || token.isEmpty()) return;
         try {
             bot = JDABuilder.createDefault(token).setStatus(OnlineStatus.ONLINE).build();
-            ServerGuard.logger.info("Discord bot invite link: " + bot.getInviteUrl(Permission.ADMINISTRATOR));
+            ServerGuard.LOGGER.info("Discord bot invite link: {}", bot.getInviteUrl(Permission.ADMINISTRATOR));
         } catch (LoginException e) {
-            ServerGuard.logger.error("Exception when initializing DiscordBridge!", e);
+            ServerGuard.LOGGER.error("Exception when initializing DiscordBridge!", e);
         }
     }
 
@@ -41,16 +42,19 @@ public class DiscordBridge {
      * @param token           Token to authenticate with.
      * @param reportChannelId Channel ID to use for reports.
      */
-    public static void initialize(String token, String reportChannelId) {
+    public static void initialize(String token, String reportChannelId, String uptimeChannelId) {
         initialize(token);
-        if (bot == null || reportChannelId == null || reportChannelId.isEmpty()) return;
+        if (bot == null) return;
         try {
             bot.awaitReady();
             reportChannel = bot.getTextChannelById(reportChannelId);
+            uptimeChannel = bot.getTextChannelById(uptimeChannelId);
             if (reportChannel == null)
-                ServerGuard.logger.warn("Discord report channel null!");
+                ServerGuard.LOGGER.warn("Discord report channel null!");
+            if (uptimeChannel == null)
+                ServerGuard.LOGGER.warn("Discord uptime channel null!");
         } catch (Exception ex) {
-            ServerGuard.logger.error(ex);
+            ServerGuard.LOGGER.error(ex);
         }
     }
 
@@ -68,7 +72,7 @@ public class DiscordBridge {
         builder.setTitle(reported.getName() + " Reported");
         builder.setColor(Color.ORANGE);
         builder.addField("Reason", reason, false);
-        reportChannel.sendMessage(builder.build()).queue();
+        reportChannel.sendMessageEmbeds(builder.build()).queue();
     }
 
     /**
@@ -88,11 +92,22 @@ public class DiscordBridge {
      */
     public static void logMessage(MessageEmbed message) {
         if (reportChannel == null) return;
-        reportChannel.sendMessage(message).queue();
+        reportChannel.sendMessageEmbeds(message).queue();
+    }
+
+    /**
+     * Logs a message for the status of the server (i.e. starting, stopping, etc.).
+     *
+     * @param message Message to send.
+     */
+    public static void logUptime(MessageEmbed message) {
+        if (uptimeChannel == null) return;
+        uptimeChannel.sendMessageEmbeds(message).complete();
     }
 
     /**
      * Retrieves the JDA instance, useful for registering events or other Discord interfaces.
+     *
      * @return {@link JDA} instance.
      */
     public static JDA getJDA() {
